@@ -1,0 +1,119 @@
+---
+/**
+ * Diagrama del ciclo: Spec funcional → Spec técnica → Reglas del juego →
+ * Roadmap por hitos → Ejecución → Dónde vive, y de vuelta. Construido en SVG con
+ * tokens (nunca una imagen) para que se vea nítido en los dos modos.
+ *
+ * `actual` ilumina una fase (1 a 6); 0 muestra el ciclo completo.
+ * `mini` quita las etiquetas y el lazo de retorno (para la apertura de cada fase).
+ * Se dibuja paso a paso cuando la diapositiva se activa (ver ciclo.css).
+ */
+import { FASES } from '../lib/fases';
+
+interface Props {
+  actual?: number;
+  mini?: boolean;
+  /** Si es true, los nodos son enlaces a la apertura de su fase. */
+  enlaces?: boolean;
+}
+const { actual = 0, mini = false, enlaces = true } = Astro.props;
+
+const ETIQUETAS: string[][] = [
+  ['Spec', 'funcional'],
+  ['Spec', 'técnica'],
+  ['Reglas', 'del juego'],
+  ['Roadmap', 'por hitos'],
+  ['Ejecución'],
+  ['Dónde', 'vive'],
+];
+
+const R = 40;
+const nodosH = FASES.map((f, i) => ({ ...f, cx: 140 + i * 192, cy: mini ? 60 : 130, i }));
+const nodosV = FASES.map((f, i) => ({ ...f, cx: 60, cy: 56 + i * 96, i }));
+const alturaH = mini ? 120 : 270;
+const alturaV = 6 * 96 + 40;
+---
+
+<figure class:list={['ciclo', { 'ciclo--mini': mini }]} data-actual={actual || undefined} aria-label={mini && actual ? `Fase ${actual} de 6: ${FASES[actual - 1]?.nombre}` : 'El ciclo completo, en seis fases'}>
+  {/* Horizontal: pantallas medianas y grandes */}
+  <svg class="ciclo__svg ciclo__svg--h" viewBox={`0 0 1240 ${alturaH}`} role="group" aria-label="Fases del ciclo" focusable="false">
+    <defs>
+      <marker id={`flecha-h-${mini ? 'm' : 'g'}`} viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M1 1 L8 5 L1 9" fill="none" stroke="context-stroke" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+      </marker>
+    </defs>
+    {nodosH.slice(0, -1).map((n) => (
+      <path
+        class="ciclo__arista"
+        style={`--i:${n.i}; --c: var(--fase-${n.n})`}
+        d={`M${n.cx + R + 8} ${n.cy} H${nodosH[n.i + 1]!.cx - R - 10}`}
+        pathLength="1"
+        marker-end={`url(#flecha-h-${mini ? 'm' : 'g'})`}
+      />
+    ))}
+    {!mini && (
+      <path
+        class="ciclo__lazo"
+        style="--i:6"
+        d={`M${nodosH[5]!.cx} ${nodosH[5]!.cy + R + 8} V228 Q${nodosH[5]!.cx} 244 ${nodosH[5]!.cx - 16} 244 H${nodosH[0]!.cx + 16} Q${nodosH[0]!.cx} 244 ${nodosH[0]!.cx} 228 V${nodosH[0]!.cy + R + 14}`}
+        pathLength="1"
+        marker-end={`url(#flecha-h-g)`}
+      />
+    )}
+    {nodosH.map((n) => {
+      const nodo = (
+        <g class="ciclo__nodo" data-actual={actual === n.n ? '' : undefined} style={`--i:${n.i}; --c: var(--fase-${n.n})`}>
+          <circle class="ciclo__aro" cx={n.cx} cy={n.cy} r={R}></circle>
+          <text class="ciclo__num" font-size="38" x={n.cx} y={n.cy + 14} text-anchor="middle">{n.n}</text>
+          {!mini && (
+            <text class="ciclo__etq" font-size="27" text-anchor="middle">
+              {ETIQUETAS[n.i]!.map((linea, k) => (
+                <tspan x={n.cx} y={(ETIQUETAS[n.i]!.length === 1 ? 52 : 36) + k * 30}>{linea}</tspan>
+              ))}
+            </text>
+          )}
+        </g>
+      );
+      return enlaces ? (
+        <a href={`#/${n.n + 2}/0`} aria-label={`Ir a la fase ${n.n}: ${n.nombre}`}>{nodo}</a>
+      ) : nodo;
+    })}
+  </svg>
+
+  {/* Vertical: celulares */}
+  <svg class="ciclo__svg ciclo__svg--v" viewBox={`0 0 360 ${alturaV}`} role="group" aria-label="Fases del ciclo" focusable="false">
+    <defs>
+      <marker id="flecha-v" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M1 1 L8 5 L1 9" fill="none" stroke="context-stroke" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+      </marker>
+    </defs>
+    {nodosV.slice(0, -1).map((n) => (
+      <path class="ciclo__arista" style={`--i:${n.i}; --c: var(--fase-${n.n})`} d={`M${n.cx} ${n.cy + 36} V${nodosV[n.i + 1]!.cy - 38}`} pathLength="1" marker-end="url(#flecha-v)" />
+    ))}
+    {!mini && (
+      <path
+        class="ciclo__lazo"
+        style="--i:6"
+        d={`M${nodosV[5]!.cx + 34} ${nodosV[5]!.cy} H330 V${nodosV[0]!.cy} H${nodosV[0]!.cx + 40}`}
+        pathLength="1"
+        marker-end="url(#flecha-v)"
+      />
+    )}
+    {nodosV.map((n) => {
+      const nodo = (
+        <g class="ciclo__nodo" data-actual={actual === n.n ? '' : undefined} style={`--i:${n.i}; --c: var(--fase-${n.n})`}>
+          <circle class="ciclo__aro" cx={n.cx} cy={n.cy} r="30"></circle>
+          <text class="ciclo__num ciclo__num--v" font-size="30" x={n.cx} y={n.cy + 11} text-anchor="middle">{n.n}</text>
+          <text class="ciclo__etq ciclo__etq--v" font-size="24" x="108" y={n.cy + 8}>{ETIQUETAS[n.i]!.join(' ')}</text>
+        </g>
+      );
+      return enlaces ? (
+        <a href={`#/${n.n + 2}/0`} aria-label={`Ir a la fase ${n.n}: ${n.nombre}`}>{nodo}</a>
+      ) : nodo;
+    })}
+  </svg>
+
+  <figcaption class="solo-lectura">
+    El ciclo: {FASES.map((f) => f.nombre).join(' → ')}, y de vuelta al principio.
+  </figcaption>
+</figure>

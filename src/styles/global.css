@@ -1,0 +1,14 @@
+/*
+ * Hoja global de la presentación.
+ *
+ * Primero el sistema de diseño de GDG Santa Cruz tal cual (Tailwind + tokens de
+ * las tres capas); después lo propio del taller, que solo lee la capa 2.
+ */
+@import '../../design-system/estilos/global.css';
+@import './base.css';
+@import './marco.css';
+@import './diapositivas.css';
+@import './tipos.css';
+@import './ciclo.css';
+@import './codigo.css';
+@import './lectura.css';

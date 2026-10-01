@@ -1,0 +1,150 @@
+---
+import { Image } from 'astro:assets';
+import Ciclo from './Ciclo.astro';
+import Video from './Video.astro';
+import type { ItemDiapo } from '../lib/deck';
+import { FASES } from '../lib/fases';
+import perfil from '../assets/personas/perfil.webp';
+
+interface Props {
+  d: ItemDiapo;
+  etiquetaBloque: string;
+}
+const { d, etiquetaBloque } = Astro.props;
+const fase = d.fase ? FASES[d.fase - 1] : undefined;
+const Titulo = d.tipo === 'portada' ? 'h1' : 'h3';
+---
+
+<article
+  class={`diap diap--${d.tipo}`}
+  id={`d-${d.id.replace('.', '-')}`}
+  data-id={d.id}
+  data-bloque={d.bloque}
+  data-n={d.n}
+  data-pasos={d.pasos}
+  data-tipo={d.tipo}
+  data-fase={d.fase || undefined}
+  aria-roledescription="diapositiva"
+  aria-label={`Diapositiva ${d.id}${d.titulo ? ': ' + d.titulo : ''}`}
+>
+  <div class="diap__cuerpo">
+    {d.tipo === 'portada' && (
+      <>
+        <Video nombre="agentes1" clase="portada__video" />
+        <div class="portada__texto">
+          <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>
+          <Titulo class="portada__titulo titular ent" style="--i:1">{d.titulo}</Titulo>
+          <p class="portada__sub ent" style="--i:2" data-teclear-linea>
+            <span class="prompt-signo" aria-hidden="true">&gt;</span>
+            <span data-teclear-texto>{d.subtitulo}</span>
+          </p>
+          <div class="portada__firma ent" style="--i:3">
+            <img class="logo logo--oscuro" src="/media/gdg-logo-oscuro.svg" width="1920" height="390" alt="Google Developer Group Santa Cruz" />
+            <img class="logo logo--claro" src="/media/gdg-logo-claro.svg" width="1920" height="390" alt="Google Developer Group Santa Cruz" />
+          </div>
+        </div>
+      </>
+    )}
+
+    {d.tipo === 'perfil' && (
+      <div class="perfil">
+        <div class="perfil__foto ent" style="--i:0">
+          <Image src={perfil} alt="Retrato de Kevin Brayan Gómez Rocha" width={480} height={480} widths={[240, 360, 480]} sizes="(max-width: 820px) 60vw, 28vw" loading="eager" />
+        </div>
+        <div class="perfil__texto">
+          <p class="etiqueta ent" style="--i:1">{d.etiqueta}</p>
+          <h3 class="titulo titular ent" style="--i:2">{d.titulo}</h3>
+          <p class="subtitulo ent" style="--i:3">{d.datos.rol}</p>
+          <div class="perfil__lista ent" style="--i:4" set:html={d.html} />
+          <p class="perfil__comunidades ent" style="--i:5">{d.datos.comunidades}</p>
+        </div>
+      </div>
+    )}
+
+    {d.tipo === 'apertura' && (
+      <div class="apertura">
+        <p class="apertura__num ent" style="--i:0" aria-hidden="true">{d.fase}</p>
+        <div class="apertura__texto">
+          <p class="etiqueta ent" style="--i:1">{etiquetaBloque}</p>
+          <h3 class="titulo ent" style="--i:2">{d.titulo}</h3>
+          {fase && <p class="subtitulo apertura__fase ent" style="--i:3">{fase.nombre}</p>}
+        </div>
+        <div class="apertura__ciclo ent" style="--i:4">
+          <Ciclo actual={d.fase} mini />
+        </div>
+      </div>
+    )}
+
+    {d.tipo === 'lista' && (
+      <div class="lista">
+        <header class="cabeza">
+          {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
+          <Titulo class="titulo ent" style="--i:1">{d.titulo}</Titulo>
+          {d.subtitulo && <p class="subtitulo ent" style="--i:2">{d.subtitulo}</p>}
+        </header>
+        <div class="lista__items" set:html={d.html} />
+      </div>
+    )}
+
+    {d.tipo === 'tabla' && d.tabla && (
+      <div class="tabla">
+        <header class="cabeza">
+          {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
+          <Titulo class="titulo ent" style="--i:1">{d.titulo}</Titulo>
+        </header>
+        <div class={`tabla__cols tabla__cols--${d.tabla.cols.length}`} role="table" aria-label={d.titulo}>
+          <div role="rowgroup" class="solo-lectura">
+            <div role="row">{d.tabla.cols.map((c) => <span role="columnheader" set:html={c} />)}</div>
+          </div>
+          {d.tabla.cols.map((c, ci) => (
+            <section class="tabla__col" data-lado={ci === 0 ? 'izq' : ci === d.tabla!.cols.length - 1 ? 'der' : 'centro'} style={`--col:${ci}`}>
+              <h4 class="tabla__cab" set:html={c} />
+              <ul class="tabla__filas">
+                {d.tabla!.filas.map((f, fi) => (
+                  <li class="tabla__fila" style={`--fila:${fi}`} set:html={f[ci]} />
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {d.tipo === 'prompt' && (
+      <div class="prompt">
+        <header class="cabeza">
+          {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
+          <Titulo class="titulo ent" style="--i:1">{d.titulo}</Titulo>
+        </header>
+        <div class="prompt__codigo ent" style="--i:2" set:html={d.html} />
+      </div>
+    )}
+
+    {d.tipo === 'remate' && (
+      <div class="remate">
+        {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
+        <Titulo class="remate__frase titular ent" style="--i:1">{d.titulo}</Titulo>
+        {d.html && <div class="remate__cuerpo ent" style="--i:2" set:html={d.html} />}
+      </div>
+    )}
+
+    {d.tipo === 'ciclo' && (
+      <div class="ciclo-slide">
+        <header class="cabeza">
+          <Titulo class="titulo ent" style="--i:0">{d.titulo}</Titulo>
+        </header>
+        <div class="ciclo-slide__diagrama ent" style="--i:1"><Ciclo actual={0} /></div>
+        <div class="ciclo-slide__cierre ent" style="--i:2" set:html={d.html} />
+      </div>
+    )}
+
+    {d.sinDev && (
+      <aside class="sin-dev ent" style="--i:8">
+        <strong>Si no eres dev:</strong> {d.sinDev}
+      </aside>
+    )}
+
+    {d.htmlLectura && <div class="lectura-extra" set:html={d.htmlLectura} />}
+  </div>
+  <span class="diap__id" aria-hidden="true">{d.id}</span>
+</article>

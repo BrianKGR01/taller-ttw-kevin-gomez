@@ -1,0 +1,13 @@
+---
+/**
+ * Fondo vivo y sutil: malla de gradiente que respira (CSS, 24 s) y una red de
+ * nodos y conexiones (canvas) que reacciona levemente al cursor. Casi
+ * imperceptible detrás del texto. Ver ADR-007 y src/cliente/fondo.ts.
+ */
+---
+
+<div class="fondo" aria-hidden="true">
+  <div class="fondo__malla fondo__malla--a"></div>
+  <div class="fondo__malla fondo__malla--b"></div>
+  <canvas class="fondo__red" data-red></canvas>
+</div>

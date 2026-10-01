@@ -1,0 +1,237 @@
+/* ── Base: documento, tipografía, fondo vivo, cambio de tema ───────────────── */
+
+html {
+  background: var(--superficie);
+  color: var(--tinta);
+  font-family: var(--fuente-texto);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-block-size: var(--alto-vista);
+  background: transparent;
+  font-size: var(--escala-cuerpo);
+  line-height: var(--interlinea-cuerpo);
+  -webkit-font-smoothing: antialiased;
+}
+
+html[data-uso='presentacion'] {
+  overflow: hidden;
+  block-size: 100%;
+  /* Sin gesto de "atrás" por swipe ni pull-to-refresh: el swipe es de la presentación. */
+  overscroll-behavior: none;
+  touch-action: pan-y pinch-zoom;
+}
+html[data-uso='presentacion'] body {
+  overflow: hidden;
+  block-size: 100%;
+}
+html[data-ocioso][data-uso='presentacion'] {
+  cursor: none;
+}
+
+a {
+  color: var(--enlace);
+  text-underline-offset: 0.2em;
+}
+a:hover {
+  color: var(--enlace-hover);
+}
+
+::selection {
+  background: var(--realce-suave);
+  color: var(--tinta-fuerte);
+}
+
+.saltar {
+  position: fixed;
+  inset-block-start: var(--esp-2);
+  inset-inline-start: var(--esp-2);
+  z-index: 100;
+  padding: var(--esp-2) var(--esp-4);
+  border-radius: var(--radio-pastilla);
+  background: var(--superficie-elevada);
+  color: var(--tinta-fuerte);
+  transform: translateY(-200%);
+}
+.saltar:focus-visible {
+  transform: none;
+}
+
+/* ── Tipografía de roles ────────────────────────────────────────────────── */
+
+.etiqueta {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  margin: 0;
+  font-family: var(--fuente-mono);
+  font-size: var(--proy-etiqueta);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+.etiqueta::before {
+  content: '';
+  flex: none;
+  inline-size: 0.7em;
+  block-size: 0.7em;
+  border-radius: var(--radio-chico);
+  background: var(--fase-actual);
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  font-size: var(--proy-titulo);
+  line-height: var(--interlinea-titulo);
+  letter-spacing: -0.02em;
+  color: var(--tinta-fuerte);
+  text-wrap: balance;
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: var(--proy-subtitulo);
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta);
+  text-wrap: balance;
+}
+
+/*
+ * Titular con gradiente (solo titulares, ver sistema de diseño §2). En claro el
+ * token es un color sólido escrito como gradiente de una parada: este selector
+ * no sabe en qué modo está. El ancho ajustado al texto hace que el espectro
+ * recorra las palabras y no la pantalla.
+ */
+.titular {
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  padding-block-end: 0.12em;
+  color: var(--tinta-fuerte);
+  background: var(--gradiente-titular);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cursor {
+  display: inline-block;
+  inline-size: 0.55ch;
+  block-size: 1.05em;
+  margin-inline-start: 0.12em;
+  vertical-align: text-bottom;
+  background: var(--fase-actual);
+  animation: parpadeo var(--mov-cursor) steps(1) infinite;
+}
+@keyframes parpadeo {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ── Fondo vivo ─────────────────────────────────────────────────────────── */
+
+.fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.fondo__malla {
+  position: absolute;
+  inset: -25%;
+  background: var(--gradiente-hero);
+  opacity: var(--atmosfera-opacidad);
+  will-change: transform;
+}
+.fondo__malla--a {
+  animation: respira-a var(--mov-ambiente) ease-in-out infinite alternate;
+}
+.fondo__malla--b {
+  opacity: calc(var(--atmosfera-opacidad) * 0.55);
+  transform: rotate(180deg) scale(1.2);
+  animation: respira-b calc(var(--mov-ambiente) * 1.3) ease-in-out infinite alternate;
+}
+@keyframes respira-a {
+  from {
+    transform: translate3d(-4%, -2%, 0) rotate(-4deg) scale(1);
+  }
+  to {
+    transform: translate3d(4%, 3%, 0) rotate(5deg) scale(1.12);
+  }
+}
+@keyframes respira-b {
+  from {
+    transform: rotate(180deg) translate3d(3%, 2%, 0) scale(1.2);
+  }
+  to {
+    transform: rotate(168deg) translate3d(-4%, -3%, 0) scale(1.05);
+  }
+}
+.fondo__red {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  opacity: var(--red-opacidad);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fondo__malla {
+    animation: none;
+  }
+}
+
+/* ── Cambio de tema animado ─────────────────────────────────────────────── */
+
+html.cambiando-tema,
+html.cambiando-tema *,
+html.cambiando-tema *::before,
+html.cambiando-tema *::after {
+  transition:
+    background-color var(--mov-medio) var(--curva-estandar),
+    color var(--mov-medio) var(--curva-estandar),
+    border-color var(--mov-medio) var(--curva-estandar),
+    fill var(--mov-medio) var(--curva-estandar),
+    stroke var(--mov-medio) var(--curva-estandar) !important;
+}
+
+/* View Transitions: el tema nuevo se revela en círculo desde el botón. */
+html[data-vt='tema']::view-transition-old(root),
+html[data-vt='tema']::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html[data-vt='tema']::view-transition-new(root) {
+  z-index: 2;
+  animation: revelar-tema var(--mov-escena) var(--curva-suave) both;
+}
+html[data-vt='tema']::view-transition-old(root) {
+  z-index: 1;
+}
+@keyframes revelar-tema {
+  from {
+    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 0));
+  }
+  to {
+    clip-path: circle(var(--radio-revelado) at var(--vt-x, 50%) var(--vt-y, 0));
+  }
+}
+
+.solo-escritorio {
+  display: none;
+}
+@media (min-width: 821px) {
+  .solo-escritorio {
+    display: inline-flex;
+  }
+}
+
+[hidden] {
+  display: none !important;
+}

@@ -1,0 +1,202 @@
+/*
+ * CAPA DE LAYOUT
+ *
+ * Lo que gobierna estructura: anchos, canal, ritmo vertical, escala
+ * tipografica, radios y rejillas.
+ *
+ * Es el unico archivo del proyecto donde se escribe una longitud literal para
+ * una propiedad estructural. Igual que primitivos.css con el color.
+ *
+ * Estos tokens son GLOBALES, no parte del contrato obligatorio de temas. Un
+ * tema puede pisar cualquiera de ellos -son propiedades con alcance, funcionan
+ * igual- pero no esta obligado a declararlos. Ver 01-sistema-de-diseno.md.
+ */
+
+:root {
+  /* --- ANCHOS -------------------------------------------------------------
+   * El contenedor angosto centrado NO es el default. Este es un sitio de
+   * comunidad, no un blog: las secciones usan el ancho de la pantalla con
+   * densidad, y `prosa` se reserva para texto corrido de verdad.
+   */
+  --ancho-prosa: 68ch;
+  --ancho-contenido: 75rem;
+  --ancho-amplio: 100rem;
+
+  /* Margen lateral. Fluido para que 360px y 1920px sean el mismo diseno. */
+  --canal: clamp(1.25rem, 4vw, 3rem);
+
+  /* --- RITMO VERTICAL ------------------------------------------------------
+   * Lo aplica el componente <Seccion>, no una clase de utilidad: Tailwind
+   * expone `--spacing` como valor unico y no como espacio de nombres, asi que
+   * `py-seccion` no puede existir. Ver 01-sistema-de-diseno.md.
+   */
+  --ritmo-seccion: clamp(4rem, 9vw, 8rem);
+  --ritmo-bloque: clamp(1.5rem, 3vw, 2.5rem);
+  --ritmo-item: clamp(0.5rem, 1.5vw, 1rem);
+
+  /* --- EL HERO SE MIDE CONTRA LA ALTURA -----------------------------------
+   * Todo lo de arriba crece con el ANCHO, que es lo correcto para una seccion
+   * que se recorre con scroll: si sobra, se baja.
+   *
+   * El hero no se recorre: tiene que entrar entero de una. Y ahi el ancho
+   * miente. Un monitor de 1366x768 y uno de 1920x1080 son casi la misma clase
+   * de ancho y tienen 312px de diferencia de alto, asi que con `vw` el hero de
+   * la pantalla baja recibia el padding y la tipografia de la alta -256px de
+   * relleno y 96px de titular- y quedaba cortado por la mitad.
+   *
+   * Por eso estos tres se miden en `svh`: la altura de viewport CHICA, la que
+   * queda cuando el navegador del telefono muestra sus barras. Es el peor caso
+   * y es el que hay que hacer entrar.
+   */
+  --ritmo-hero: clamp(2rem, 7svh, 5rem);
+  --alto-hero: 84svh;
+
+  /* --- ESCALA TIPOGRAFICA --------------------------------------------------
+   * Un solo sistema, fluido. Siete escalones y ninguno mas.
+   * Los titulares son deliberadamente grandes: en los artes de referencia el
+   * texto ES la imagen.
+   */
+  /*
+   * El titular del hero es el unico escalon con techo doble: el ancho manda,
+   * pero la altura pone un limite. En 1366x768 da 77px en vez de 96px, que es
+   * la diferencia entre entrar y no entrar. En 1920x1080 el techo no muerde y
+   * queda en 6rem, tamaño pleno.
+   */
+  --escala-hero: clamp(2.75rem, min(8vw, 10svh), 6rem);
+  --escala-titulo: clamp(2rem, 5vw, 3.5rem);
+  --escala-subtitulo: clamp(1.375rem, 3vw, 1.875rem);
+  --escala-cuerpo-lg: clamp(1.0625rem, 1.2vw, 1.25rem);
+  --escala-cuerpo: 1rem;
+  --escala-nota: 0.875rem;
+  --escala-etiqueta: 0.75rem;
+
+  /* Alturas de linea: apretadas en titular, holgadas en lectura. */
+  --interlinea-hero: 0.95;
+  --interlinea-titulo: 1.05;
+  --interlinea-subtitulo: 1.2;
+  --interlinea-cuerpo: 1.65;
+  --interlinea-nota: 1.5;
+
+  /* --- RADIOS -------------------------------------------------------------- */
+  --radio-pastilla: 999px;
+  --radio-tarjeta: 0.875rem;
+  --radio-chico: 0.375rem;
+
+  /* --- REJILLAS ------------------------------------------------------------
+   * Presets con nombre, consumidos por <Rejilla>. El `min()` evita que una
+   * columna sea mas ancha que la pantalla a 360px.
+   */
+  --rejilla-tarjetas: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  --rejilla-logos: repeat(auto-fill, minmax(min(45%, 10rem), 1fr));
+  --rejilla-cifras: repeat(auto-fit, minmax(min(45%, 11rem), 1fr));
+
+  /* --- AREA TACTIL ---------------------------------------------------------
+   * El minimo que un dedo acierta con fiabilidad. Es una constante de
+   * accesibilidad, no una decision de este o aquel componente, y por eso vive
+   * acá: cualquier control que se pueda tocar lo usa.
+   *
+   * Es lo primero que falla en un telefono y lo que nunca se ve en una ventana
+   * angosta de escritorio, donde se apunta con un puntero de un pixel.
+   */
+  --area-tactil: 44px;
+
+  /* Grosor del filete de espectro que separa secciones. */
+  --filete: 2px;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * EXTENSION DEL TALLER — ESCALA DE PROYECCION
+   *
+   * Una diapositiva entra entera de una vez, asi que se mide contra la ALTURA
+   * (`svh`) ademas del ancho: gana el menor. Caso de diseno: 1366x768. Lo que
+   * entra ahi, entra en 1920x1080 y en una tablet vertical.
+   *
+   * Valores de referencia (ancho x alto -> px resultantes):
+   *                       1366x768   1920x1080   768x1024   360x740
+   *   --proy-gigante          84         112         54        36
+   *   --proy-titulo           64          88         40        32
+   *   --proy-subtitulo        34          44         24        22
+   *   --proy-cuerpo           27          34         18        17
+   *   --proy-codigo           21          24         14        15
+   *
+   * El texto NUNCA se achica para que algo entre: si no entra, se divide la
+   * diapositiva (ver instrucciones, "Legibilidad proyectada").
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --proy-gigante: clamp(2.25rem, min(7vw, 11svh), 7rem);
+  --proy-titulo: clamp(2rem, min(5.2vw, 8.4svh), 5.5rem);
+  --proy-subtitulo: clamp(1.375rem, min(2.6vw, 4.4svh), 2.75rem);
+  --proy-cuerpo: clamp(1.0625rem, min(2vw, 3.5svh), 2.125rem);
+  --proy-codigo: clamp(0.9375rem, min(1.5vw, 2.7svh), 1.5rem);
+  --proy-etiqueta: clamp(0.75rem, min(1.2vw, 2svh), 1.125rem);
+
+  --proy-margen-x: clamp(1.25rem, 6vw, 7rem);
+  --proy-margen-y: clamp(1rem, 5svh, 4rem);
+  --proy-gap: clamp(0.75rem, 2.4svh, 2rem);
+  --proy-gap-grande: clamp(1.25rem, 4.5svh, 3.5rem);
+  --proy-barra: 3.25rem;
+  --proy-ancho-texto: 62rem;
+
+  /* --- ESCALA DE ESPACIO (componentes) ----------------------------------- */
+  --esp-1: 0.25rem;
+  --esp-2: 0.5rem;
+  --esp-3: 0.75rem;
+  --esp-4: 1rem;
+  --esp-5: 1.5rem;
+  --esp-6: 2rem;
+  --esp-7: 3rem;
+  --esp-8: 4rem;
+
+  /* --- MOVIMIENTO ------------------------------------------------------------
+   * Duraciones y curvas con nombre. Elegante y rapido: un momento fuerte por
+   * diapositiva, el resto discreto. Ver "Movimiento" en el sistema de diseno.
+   */
+  --mov-instante: 90ms;
+  --mov-rapido: 160ms;
+  --mov-medio: 320ms;
+  --mov-lento: 640ms;
+  --mov-escena: 900ms;
+  --mov-ambiente: 24s;
+  --mov-escalon: 70ms;
+  --mov-teclear: 14ms;
+  --mov-recorrido: 1400ms;
+  --mov-auto-avance: 6500ms;
+
+  --curva-salida: cubic-bezier(0.16, 1, 0.3, 1);
+  --curva-entrada: cubic-bezier(0.7, 0, 0.84, 0);
+  --curva-estandar: cubic-bezier(0.4, 0, 0.2, 1);
+  --curva-suave: cubic-bezier(0.45, 0, 0.15, 1);
+
+  --desp-corto: 1.25rem;
+  --desp-medio: 3rem;
+  --desp-lado: 6rem;
+
+  /* --- COMPONENTES DEL TALLER (medidas con nombre) -------------------------- */
+  --icono: 1.25rem;
+  --icono-grande: 1.75rem;
+  --punto-fase: 1.75rem;
+  --desenfoque-velo: 14px;
+  --desenfoque-atmosfera: 70px;
+  --radio-revelado: 150vmax;
+  --alto-panel: min(88svh, 60rem);
+  --ancho-panel: min(94vw, 78rem);
+  --ancho-ayuda: min(92vw, 38rem);
+  --ancho-hoja: 54rem;
+  --alto-hoja-visor: min(62svh, 40rem);
+  --ancho-lectura: 72rem;
+  --ancho-lectura-texto: 46rem;
+  --lado-qr: min(60vw, 22rem);
+  --alto-logo: clamp(1.75rem, 7svh, 4rem);
+  --ancho-portada-texto: 64rem;
+  --alto-barra-progreso: 3px;
+  --lado-celular-ilustracion: min(70vw, 19rem);
+  --alto-video-ejecucion: 100%;
+  --ancho-tecla: 11rem;
+  --mov-cursor: 1.05s;
+  --alto-vista: 100svh;
+  --punto-terminal: 0.7rem;
+  --ancho-boton-copiar: 6.5rem;
+  --alto-portada-lectura: 22rem;
+  --lado-foto: 56svh;
+  --ancho-lista: 70rem;
+  --ancho-remate: 78rem;
+  --ancho-foto-movil: 20rem;
+}

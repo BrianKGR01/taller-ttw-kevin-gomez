@@ -1,0 +1,186 @@
+/*
+ * CAPA 1 — PRIMITIVOS
+ *
+ * Los colores que existen en el universo GDG/Google. Es el unico archivo del
+ * proyecto donde se escribe un valor de color literal.
+ *
+ * REGLA: ningun componente usa estos tokens directamente. Los componentes
+ * consumen la capa 3, que referencia la capa 2. Ver 01-sistema-de-diseno.md
+ * (sistema de diseno).
+ *
+ * Se declaran en hex y no en oklch a proposito: el Community Kit los da asi, y
+ * mantiene la verificacion de contraste en aritmetica simple.
+ */
+
+:root {
+  /* --- GDG core, del Community Kit --------------------------------------- */
+  --gdg-blue-500: #4285f4;
+  --gdg-green-500: #34a853;
+  --gdg-yellow-600: #f9ab00;
+  --gdg-red-500: #ea4335;
+
+  /* --- Halftone, del mismo kit ------------------------------------------- */
+  --gdg-halftone-blue: #57caff;
+  --gdg-halftone-green: #5cdb6d;
+  --gdg-halftone-yellow: #ffd427;
+  --gdg-halftone-red: #ff7daf;
+
+  /* --- Neutros del kit ---------------------------------------------------- */
+  --gdg-off-white: #f0f0f0;
+  --gdg-black-02: #1e1e1e;
+
+  /*
+   * Escala de grises para polaridad clara. El numero es la distancia desde el
+   * blanco, no un peso de fuente: `gris-05` es casi blanco, `gris-80` es casi
+   * negro. El brochure usa fondo blanco, tarjetas gris muy claro y titulares en
+   * casi negro —nunca negro puro, que sobre blanco vibra—.
+   */
+  --gdg-gris-05: #f8f9fa;
+  --gdg-gris-10: #f1f3f4;
+  --gdg-gris-15: #e3e6e8;
+  --gdg-gris-45: #9aa0a6;
+  --gdg-gris-50: #80868b;
+  --gdg-gris-55: #5f6368;
+  --gdg-gris-80: #3c4043;
+  --gdg-casi-negro: #202124;
+
+  /*
+   * LOS CUATRO CORE, EN SU VERSION PARA FONDO CLARO.
+   *
+   * No es una preferencia estetica: los core estan calibrados para fondo
+   * oscuro y sobre blanco no llegan. Medido contra #ffffff:
+   *
+   *   blue   #4285f4  3.56:1      red    #ea4335  3.92:1
+   *   green  #34a853  3.06:1      yellow #f9ab00  1.93:1   <- inservible
+   *
+   * El amarillo es el caso extremo y el que lo demuestra: 10.85:1 sobre negro
+   * y 1.93:1 sobre blanco. El mismo token, un factor de cinco y medio.
+   *
+   * Estos cuatro son los tonos que Google publica para superficie clara. El
+   * costo es real y hay que decirlo: el espectro del tema claro NO es
+   * exactamente el mismo cuarteto de colores que el del oscuro. Un amarillo
+   * legible sobre blanco tiene que irse al ambar, y se nota.
+   */
+  --gdg-blue-600: #1a73e8;
+  --gdg-blue-700: #1967d2;
+  --gdg-red-600: #d93025;
+  --gdg-yellow-900: #b06000;
+  --gdg-green-700: #188038;
+
+  /*
+   * Negro puro. Forma parte de la identidad de la casa desde que absorbio la
+   * estetica que estaba planificada como `io-extended`: contraste alto y
+   * bloques geometricos duros piden negro, no gris muy oscuro.
+   */
+  --gdg-negro: #000000;
+  --gdg-blanco: #ffffff;
+
+  /*
+   * Pasteles del kit. Sobre fondo oscuro bajan demasiado el contraste; sobre
+   * fondo claro son utilizables. Ver seccion 2 del sistema de diseno.
+   */
+  --gdg-pastel-blue: #c3ecf6;
+  --gdg-pastel-green: #ccf6c5;
+  --gdg-pastel-yellow: #ffe7a5;
+  --gdg-pastel-red: #f8d8d8;
+
+  /*
+   * Violeta. NO esta en la tabla del Community Kit, pero el gradiente espectro
+   * de los artes de Google lo necesita para cerrar el recorrido: sin el, el
+   * degradado termina en azul y deja de ser reconocible.
+   *
+   * Es el purpura de la paleta de Google. Si el organizer consigue el valor
+   * exacto que usa el kit para los degradados, se reemplaza aca y nada mas.
+   */
+  --gdg-purple-500: #a142f4;
+
+  /*
+   * EXTENSION DEL TALLER — cierran el espectro de 6 fases del ciclo.
+   *
+   * El kit solo da 4 colores core. Las fases 5 (cian) y 6 (violeta) necesitan
+   * una version para cada polaridad, medida igual que las demas:
+   *
+   *   --gdg-halftone-purple  #b27cff  7.22:1 sobre negro   (el violeta core,
+   *                                    #a142f4, da 4.60:1 y 3.65:1 sobre la
+   *                                    superficie elevada: no alcanza para texto)
+   *   --gdg-cyan-700         #007b83  5.05:1 sobre blanco  (el halftone-blue de
+   *                                    oscuro no existe sobre blanco)
+   *   --gdg-purple-700       #8430ce  6.37:1 sobre blanco
+   */
+  --gdg-halftone-purple: #b27cff;
+  --gdg-cyan-700: #007b83;
+  --gdg-purple-700: #8430ce;
+
+  /* --- Gradientes con nombre ---------------------------------------------
+   * Se definen como primitivos y no se improvisan por componente.
+   * Uso: bordes, texto de titular y atmosfera de fondo. NUNCA como relleno de
+   * una superficie grande de contenido: ahi matan la legibilidad.
+   */
+  --g-espectro: linear-gradient(
+    90deg,
+    var(--gdg-red-500) 0%,
+    var(--gdg-yellow-600) 22%,
+    var(--gdg-green-500) 45%,
+    var(--gdg-halftone-blue) 68%,
+    var(--gdg-blue-500) 85%,
+    var(--gdg-purple-500) 100%
+  );
+
+  /*
+   * El espectro con paradas duras: cuatro bandas planas, sin interpolacion.
+   *
+   * `0% 25%` es la sintaxis de doble parada: el color ocupa ese tramo entero y
+   * corta seco. Es el mismo token de estructura que en oscuro es un degradado
+   * continuo, pero en claro los cuatro colores de Google viven planos y
+   * separados. Ver la nota de --gradiente-borde en semanticos.css.
+   */
+  --g-espectro-plano: linear-gradient(
+    90deg,
+    var(--gdg-blue-600) 0% 25%,
+    var(--gdg-red-600) 25% 50%,
+    var(--gdg-yellow-900) 50% 75%,
+    var(--gdg-green-700) 75% 100%
+  );
+
+  /*
+   * La atmosfera del hero en polaridad clara. En oscuro es el espectro al 22 %
+   * y desenfocado; sobre blanco eso ensucia y no aporta, asi que es un lavado
+   * de pasteles casi imperceptible. Los pasteles del kit por fin sirven: sobre
+   * fondo oscuro bajan demasiado el contraste, sobre blanco funcionan.
+   */
+  --g-lavado-claro: linear-gradient(
+    112deg,
+    var(--gdg-pastel-blue) 0%,
+    var(--gdg-blanco) 60%,
+    var(--gdg-pastel-green) 100%
+  );
+
+  /*
+   * Un color solido escrito como gradiente de una parada. Existe para que el
+   * titular del hero pueda rellenarse igual en los dos modos sin que el
+   * componente sepa en cual esta: en claro el brochure no rellena texto con
+   * degradados, y esto es lo que le corresponde.
+   */
+  --g-tinta-solida: linear-gradient(var(--gdg-casi-negro), var(--gdg-casi-negro));
+
+  --g-frio: linear-gradient(
+    90deg,
+    var(--gdg-halftone-blue) 0%,
+    var(--gdg-blue-500) 50%,
+    var(--gdg-purple-500) 100%
+  );
+
+  --g-calido: linear-gradient(
+    90deg,
+    var(--gdg-yellow-600) 0%,
+    var(--gdg-halftone-red) 55%,
+    var(--gdg-red-500) 100%
+  );
+
+  /*
+   * EXTENSION DEL TALLER — mascara de halo (solo canal alfa). Desvanece los
+   * bordes de un video de atmosfera. Es un primitivo porque lleva un color
+   * literal (el negro opaco), aunque solo se use su opacidad.
+   */
+  --m-halo: radial-gradient(ellipse at 70% 50%, var(--gdg-negro) 20%, transparent 85%);
+}

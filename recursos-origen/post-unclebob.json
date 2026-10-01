@@ -1,0 +1,13 @@
+{
+  "texto": "I don’t review code written by agents. I measure things like test coverage, dependency structure, cyclomatic complexity, module sizes, mutation testing, etc.\n\nMuch can be inferred about the quality of the code from those metrics. The code itself I leave to the AI.\n\nHumans are slow at code. To get productivity we humans need to disengage from code and manage from a higher level.",
+  "textoCorto": "I don’t review code written by agents.",
+  "autor": "Uncle Bob Martin",
+  "cuenta": "@unclebobmartin",
+  "fecha": "2026-04-14T18:04:56Z",
+  "fechaLegible": "14 abr 2026",
+  "respondeA": "@wookash_podcast (Łukasz | Wookash Podcast): \"To people who are *good* at reviewing code (or claim to be hehe) - how is that possible? ...\"",
+  "metricas": { "me_gusta": 1310, "vistas": 163800, "fecha_consulta": "2026-10-01" },
+  "url": "https://x.com/unclebobmartin/status/2044114698451476492",
+  "fuente": "Verificado el 2026-10-01 en la página real de x.com (navegador integrado) y en cdn.syndication.twimg.com/tweet-result (API pública de X); texto completo coincide con api.fxtwitter.com.",
+  "verificado": true
+}

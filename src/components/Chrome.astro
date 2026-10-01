@@ -1,0 +1,137 @@
+---
+/**
+ * Marco de la aplicación: barra superior (marca, fases, controles), pie
+ * (anterior · progreso · siguiente), vista general y ayuda de atajos.
+ * Los controles son `Accion`: lo único con forma de píldora.
+ */
+import { FASES } from '../lib/fases';
+import type { ItemBloque } from '../lib/deck';
+
+interface Props {
+  bloques: ItemBloque[];
+}
+const { bloques } = Astro.props;
+
+const ATAJOS: [string, string][] = [
+  ['← →', 'Entre bloques'],
+  ['↑ ↓', 'Entre diapositivas del bloque'],
+  ['Espacio · Re Pág · Av Pág', 'Avanzar o retroceder paso a paso'],
+  ['Inicio · Fin', 'Primera o última diapositiva'],
+  ['Esc · O', 'Vista general'],
+  ['T', 'Tema: sistema · claro · oscuro'],
+  ['L', 'Modo presentación · modo lectura'],
+  ['F', 'Pantalla completa'],
+  ['S', 'Vista de presentador'],
+  ['?', 'Esta ayuda'],
+];
+---
+
+<a class="saltar" href="#principal">Saltar al contenido</a>
+
+<header class="barra" data-chrome>
+  <a class="barra__marca" href="#/0/1" aria-label="Ir a la portada">
+    <svg class="barra__isotipo" viewBox="0 0 550 550" aria-hidden="true" focusable="false"><use href="#gdg-isotipo"></use></svg>
+    <span class="barra__nombre">IA aplicada al desarrollo de software</span>
+  </a>
+
+  <nav class="fases" aria-label="Fases del ciclo">
+    <ol class="fases__lista">
+      {FASES.map((f) => (
+        <li>
+          <a class="fases__item" data-fase={f.n} href={`#/${f.n + 2}/0`} data-fase-link={f.n} aria-label={`Fase ${f.n}: ${f.nombre}`}>
+            <span class="fases__punto" aria-hidden="true">{f.n}</span>
+            <span class="fases__texto">{f.nombre}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+
+  <div class="herramientas" role="toolbar" aria-label="Controles de la presentación">
+    <button type="button" class="accion accion--secundaria accion--icono" data-accion="vista-general" aria-haspopup="dialog" aria-label="Vista general (Esc u O)" title="Vista general (Esc u O)">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>
+    </button>
+    <button type="button" class="accion accion--secundaria accion--icono" data-accion="modo" aria-pressed="false" aria-label="Modo lectura (L)" title="Cambiar entre presentación y lectura (L)">
+      <svg class="icono-a-lectura" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 5.5C4 5.2 4.2 5 4.5 5H10c1 0 2 .6 2 1.6V19c0-.9-.9-1.5-2-1.5H4.5a.5.5 0 0 1-.5-.5V5.5Z"/><path d="M20 5.5c0-.3-.2-.5-.5-.5H14c-1 0-2 .6-2 1.6V19c0-.9.9-1.5 2-1.5h5.5c.3 0 .5-.2.5-.5V5.5Z"/></svg>
+      <svg class="icono-a-presentacion" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+    </button>
+    <button type="button" class="accion accion--secundaria accion--icono" data-accion="tema" aria-label="Tema: sistema (T)" title="Tema: sistema · claro · oscuro (T)">
+      <svg class="icono-tema icono-tema--sistema" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+      <svg class="icono-tema icono-tema--claro" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>
+      <svg class="icono-tema icono-tema--oscuro" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+    </button>
+    <button type="button" class="accion accion--secundaria accion--icono" data-accion="pantalla-completa" aria-label="Pantalla completa (F)" title="Pantalla completa (F)">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+    </button>
+    <button type="button" class="accion accion--secundaria accion--icono solo-escritorio" data-accion="presentador" aria-label="Vista de presentador (S)" title="Vista de presentador (S)">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="12" rx="2"/><circle cx="12" cy="10" r="2"/><path d="M8 20c.6-2 2-3 4-3s3.4 1 4 3"/></svg>
+    </button>
+    <button type="button" class="accion accion--secundaria accion--icono" data-accion="ayuda" aria-haspopup="dialog" aria-label="Atajos de teclado (?)" title="Atajos de teclado (?)">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1.9-1.1 1.8M12 17h.01"/></svg>
+    </button>
+  </div>
+</header>
+
+<footer class="pie" data-chrome>
+  <button type="button" class="accion accion--secundaria accion--icono pie__nav" data-accion="anterior" aria-label="Anterior" title="Anterior">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+  <div class="pie__centro">
+    <div class="progreso" role="progressbar" aria-label="Progreso del taller" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="progreso__barra"></div>
+    </div>
+  </div>
+  <p class="pie__numero" aria-live="off"><span data-numero-id>0.1</span><span class="pie__sep" aria-hidden="true"> · </span><span class="pie__total"><span data-numero-lineal>1</span>/<span data-numero-total>1</span></span></p>
+  <button type="button" class="accion accion--secundaria accion--icono pie__nav" data-accion="siguiente" aria-label="Siguiente" title="Siguiente">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
+</footer>
+
+<dialog class="panel vista-general" id="vista-general" aria-labelledby="vg-titulo">
+  <div class="panel__cab">
+    <h2 id="vg-titulo" class="panel__titulo">Vista general</h2>
+    <button type="button" class="accion accion--secundaria accion--icono" data-cerrar-panel aria-label="Cerrar la vista general">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="vg__rejilla">
+    {bloques.map((b) => (
+      <section class="vg__bloque" data-fase={b.fase || undefined} aria-label={`Bloque ${b.numero}: ${b.titulo}`}>
+        <h3 class="vg__cab">
+          <span class="vg__num">{b.numero}</span>
+          <span class="vg__nombre">{b.titulo}</span>
+        </h3>
+        <ul class="vg__diapos">
+          {b.diapos.map((d) => (
+            <li>
+              <a class="vg__diapo" href={`#/${b.numero}/${d.n}`} data-ir={`${b.numero}/${d.n}`}>
+                <span class="vg__id">{d.id}</span>
+                <span class="vg__t">{d.tipo === 'apertura' ? `Fase ${b.fase}` : (d.titulo ?? d.etiqueta ?? d.id)}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</dialog>
+
+<dialog class="panel ayuda" id="ayuda" aria-labelledby="ay-titulo">
+  <div class="panel__cab">
+    <h2 id="ay-titulo" class="panel__titulo">Atajos de teclado</h2>
+    <button type="button" class="accion accion--secundaria accion--icono" data-cerrar-panel aria-label="Cerrar la ayuda">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <dl class="ayuda__lista">
+    {ATAJOS.map(([tecla, texto]) => (
+      <div class="ayuda__fila">
+        <dt><kbd>{tecla}</kbd></dt>
+        <dd>{texto}</dd>
+      </div>
+    ))}
+  </dl>
+  <p class="ayuda__nota">En el celular: desliza horizontalmente entre bloques y verticalmente entre diapositivas.</p>
+</dialog>
+
+<div class="anuncio solo-lectura" role="status" aria-live="polite" data-anuncio></div>

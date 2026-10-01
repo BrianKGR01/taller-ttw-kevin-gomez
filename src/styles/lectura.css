@@ -1,0 +1,176 @@
+/* ── Modo lectura: todo el contenido en scroll vertical continuo ──────────────
+ *
+ * Comparte el mismo DOM que el modo presentación. Lo único que cambia es la
+ * escala (de proyección a lectura) y la disposición. ADR-005.
+ */
+
+html[data-uso='lectura'] {
+  --proy-gigante: var(--escala-titulo);
+  --proy-titulo: var(--escala-subtitulo);
+  --proy-subtitulo: var(--escala-cuerpo-lg);
+  --proy-cuerpo: var(--escala-cuerpo-lg);
+  --proy-codigo: var(--escala-nota);
+  --proy-etiqueta: var(--escala-etiqueta);
+  --proy-gap: var(--ritmo-item);
+  --proy-gap-grande: var(--ritmo-bloque);
+  --proy-margen-x: var(--canal);
+  --proy-margen-y: var(--esp-5);
+  --proy-ancho-texto: var(--ancho-lectura-texto);
+  scroll-padding-block-start: calc(var(--proy-barra) + var(--esp-4));
+  scroll-behavior: smooth;
+}
+
+html[data-uso='lectura'] .escenario {
+  position: relative;
+  inset: auto;
+  padding-block: calc(var(--proy-barra) + var(--esp-5)) calc(var(--proy-barra) + var(--ritmo-seccion));
+}
+
+html[data-uso='lectura'] .bloque {
+  display: block;
+  max-inline-size: var(--ancho-lectura);
+  margin-inline: auto;
+  padding-inline: var(--canal);
+  margin-block-end: var(--ritmo-seccion);
+}
+
+html[data-uso='lectura'] .bloque__cab {
+  position: relative;
+  display: grid;
+  gap: var(--esp-3);
+  padding-block: var(--ritmo-bloque) var(--ritmo-item);
+}
+html[data-uso='lectura'] .bloque__cab::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: var(--filete);
+  background: var(--gradiente-borde);
+}
+.bloque__titulo {
+  margin: 0;
+  font-family: var(--fuente-display);
+  font-size: var(--escala-titulo);
+  line-height: var(--interlinea-titulo);
+  letter-spacing: -0.02em;
+  color: var(--tinta-fuerte);
+  text-wrap: balance;
+}
+
+html[data-uso='lectura'] .diap {
+  position: relative;
+  inset: auto;
+  display: block;
+  overflow: visible;
+  margin-block-end: var(--ritmo-bloque);
+  padding: var(--esp-5);
+  border: var(--filete) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  background: color-mix(in srgb, var(--superficie-elevada) 86%, transparent);
+  isolation: isolate;
+}
+html[data-uso='lectura'] .diap__cuerpo {
+  display: grid;
+  gap: var(--proy-gap-grande);
+  max-inline-size: none;
+}
+html[data-uso='lectura'] .diap__id {
+  position: absolute;
+  inset-block-start: var(--esp-3);
+  inset-inline-end: var(--esp-4);
+  display: block;
+  font-family: var(--fuente-mono);
+  font-size: var(--escala-etiqueta);
+  color: var(--tinta-suave);
+}
+html[data-uso='lectura'] .diap--portada,
+html[data-uso='lectura'] .diap--apertura {
+  overflow: hidden;
+}
+html[data-uso='lectura'] .diap--portada {
+  min-block-size: var(--alto-portada-lectura);
+  display: grid;
+  align-items: end;
+}
+html[data-uso='lectura'] .diap--apertura {
+  border-inline-start: var(--esp-1) solid var(--fase-actual);
+}
+html[data-uso='lectura'] .apertura__num {
+  font-size: calc(var(--escala-titulo) * 1.8);
+}
+html[data-uso='lectura'] .apertura__ciclo {
+  display: none;
+}
+html[data-uso='lectura'] .tabla__cols {
+  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+}
+html[data-uso='lectura'] .remate {
+  padding-inline-start: var(--esp-5);
+}
+
+/* Contenido que solo existe en lectura. */
+.lectura-extra {
+  display: none;
+}
+html[data-uso='lectura'] .lectura-extra {
+  display: block;
+  max-inline-size: var(--ancho-lectura-texto);
+  font-size: var(--escala-cuerpo);
+  line-height: var(--interlinea-cuerpo);
+}
+html[data-uso='lectura'] .lectura-extra :where(h4, h5) {
+  margin-block: var(--esp-4) var(--esp-2);
+  color: var(--tinta-fuerte);
+}
+
+/* Marco en lectura: barra con velo, pie reducido. */
+html[data-uso='lectura'] .barra {
+  background: var(--velo);
+  backdrop-filter: blur(var(--desenfoque-velo));
+  border-block-end: var(--filete) solid var(--borde);
+}
+html[data-uso='lectura'] .pie {
+  block-size: auto;
+  inset-block-end: 0;
+  padding-block: 0;
+  align-items: end;
+}
+html[data-uso='lectura'] .pie__nav {
+  display: none;
+}
+html[data-uso='lectura'] .pie__centro {
+  flex: 1;
+}
+html[data-uso='lectura'] .pie__numero {
+  margin-block-end: var(--esp-3);
+  padding: var(--esp-1) var(--esp-3);
+  border-radius: var(--radio-pastilla);
+  background: var(--velo);
+  backdrop-filter: blur(var(--desenfoque-velo));
+}
+html[data-uso='lectura'] .progreso {
+  align-self: end;
+  margin-block-end: 0;
+}
+
+/* La apertura de fase repite la cabecera del bloque: en lectura solo queda la cabecera. */
+html[data-uso='lectura'] .diap--apertura {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  .barra [data-accion='pantalla-completa'],
+  .barra [data-accion='ayuda'] {
+    display: none;
+  }
+  .fases__item:not([aria-current='step']) {
+    display: none;
+  }
+  .fases__item[aria-current='step'] .fases__texto {
+    display: inline;
+  }
+  .barra__nombre {
+    display: none;
+  }
+}

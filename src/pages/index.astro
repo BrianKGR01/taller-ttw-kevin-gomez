@@ -1,0 +1,38 @@
+---
+import Base from '../layouts/Base.astro';
+import Isotipo from '../components/Isotipo.astro';
+import Fondo from '../components/Fondo.astro';
+import Chrome from '../components/Chrome.astro';
+import Diapositiva from '../components/Diapositiva.astro';
+import { cargarBloques, metaDeck } from '../lib/deck';
+
+const bloques = await cargarBloques();
+const deck = metaDeck(bloques);
+const descripcion =
+  'Taller de Kevin Brayan Gómez Rocha en Tarija Tech Week 2026 (GDG Santa Cruz): el proceso para planificar como ingeniero y que la IA construya como un equipo. Prompts, plantillas y diagramas para copiar.';
+---
+
+<Base titulo="IA aplicada al desarrollo de software · Tarija Tech Week 2026" descripcion={descripcion}>
+  <Isotipo />
+  <Fondo />
+  <Chrome bloques={bloques} />
+
+  <main id="principal" class="escenario" tabindex="-1">
+    {bloques.map((b) => (
+      <section class="bloque" id={`b-${b.numero}`} data-bloque={b.numero} data-fase={b.fase || undefined} aria-labelledby={`bt-${b.numero}`}>
+        <header class="bloque__cab">
+          <p class="etiqueta">Bloque {b.numero}{b.fase ? ` · Fase ${b.fase}` : ''}</p>
+          <h2 id={`bt-${b.numero}`} class="bloque__titulo">{b.titulo}</h2>
+        </header>
+        {b.diapos.map((d) => (
+          <Diapositiva d={d} etiquetaBloque={`Bloque ${b.numero}`} />
+        ))}
+      </section>
+    ))}
+  </main>
+
+  <script type="application/json" id="deck-meta" set:html={JSON.stringify(deck)} />
+  <script>
+    import '../cliente/principal';
+  </script>
+</Base>

@@ -1,0 +1,85 @@
+/* ── Bloques de código y prompts (efecto terminal) ────────────────────────── */
+
+.codigo {
+  margin: 0;
+  border: var(--filete) solid var(--borde-fuerte);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie-hundida);
+  overflow: hidden;
+}
+.codigo__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-4);
+  padding: var(--esp-2) var(--esp-2) var(--esp-2) var(--esp-4);
+  border-block-end: var(--filete) solid var(--borde);
+  font-family: var(--fuente-mono);
+  font-size: var(--escala-etiqueta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+.codigo__titulo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-3);
+}
+/* Tres puntos de ventana de terminal, con los colores de fase. */
+.codigo__titulo::before {
+  content: '';
+  inline-size: var(--punto-terminal);
+  block-size: var(--punto-terminal);
+  border-radius: 50%;
+  background: var(--fase-2);
+  box-shadow:
+    calc(var(--punto-terminal) * 1.6) 0 0 var(--fase-3),
+    calc(var(--punto-terminal) * 3.2) 0 0 var(--fase-4);
+  margin-inline-end: calc(var(--punto-terminal) * 3.4);
+}
+.codigo__pre {
+  margin: 0;
+  padding: var(--proy-gap) var(--proy-gap-grande);
+  max-block-size: var(--alto-hoja-visor);
+  overflow: auto;
+  font-family: var(--fuente-mono);
+  font-size: var(--proy-codigo);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--tinta);
+  tab-size: 2;
+}
+.codigo__pre code {
+  font: inherit;
+}
+.t-resto {
+  visibility: hidden;
+}
+.codigo .cursor {
+  inline-size: 0.6ch;
+}
+
+/* Confirmación animada al copiar. */
+.codigo__copiar {
+  font-size: var(--escala-etiqueta);
+  min-inline-size: var(--ancho-boton-copiar);
+}
+[data-copiar][data-estado='copiado'] {
+  border-color: var(--exito);
+  color: var(--exito);
+  animation: copiado var(--mov-medio) var(--curva-salida);
+}
+[data-copiar][data-estado='copiado'] [data-copiar-texto]::before {
+  content: '✓';
+  margin-inline-end: var(--esp-1);
+}
+[data-copiar][data-estado='error'] {
+  border-color: var(--fase-2);
+}
+@keyframes copiado {
+  40% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 var(--esp-2) var(--fase-suave);
+  }
+}

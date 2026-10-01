@@ -1,0 +1,53 @@
+/*
+ * TIPOGRAFIA — archivos y declaraciones.
+ *
+ * Google Sans y Google Sans Mono autohospedadas, segun la ADR-002. No se sirven
+ * desde un CDN externo.
+ *
+ * Los archivos se referencian con ruta relativa (desde design-system/estilos/
+ * hasta assets/fuentes/ en la raiz del repo) para que Vite los versione con
+ * hash: eso permite cachearlos por un año sin riesgo de servir uno viejo.
+ *
+ * `font-display: swap` a proposito: primero se ve el texto con la pila de
+ * respaldo y despues cambia. Es preferible a que el titular no exista durante
+ * medio segundo en una conexion lenta, que es como llega buena parte del
+ * trafico de esta comunidad.
+ */
+
+@font-face {
+  font-family: 'Google Sans';
+  src: url('../../assets/fuentes/GoogleSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans';
+  src: url('../../assets/fuentes/GoogleSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * Los pesos Medium (500) de ambas familias estan en el repositorio pero NO se
+ * declaran, y por lo tanto Vite no los emite ni el navegador los descarga.
+ *
+ * No es un olvido: la ADR-002 pide servir solo los pesos que el diseno usa.
+ * Declararlos «por si acaso» costaria 563 KB en la primera visita, que es casi
+ * un tercio de todo lo que pesa el sitio.
+ *
+ * Cuando una pagina los necesite de verdad, se agregan estos dos bloques:
+ *
+ *   GoogleSans-Medium.woff2      peso 500  ·  554 KB
+ *   GoogleSansMono-Medium.woff2  peso 500  ·    9 KB
+ */
+
+@font-face {
+  font-family: 'Google Sans Mono';
+  src: url('../../assets/fuentes/GoogleSansMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

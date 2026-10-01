@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.astro/
+.vercel/
+test-results/
+playwright-report/
+*.log
+.env
+.env.*
+*.ttf
+.DS_Store
+
+# Documentos reales de otro proyecto: no se publican (solo se versionan las
+# versiones anonimizadas en ejemplos/).
+assets/ejemplo-AGENTS.md
+assets/ejemplo-roadmap.md
+recursos-origen/libros/*-original.jpg

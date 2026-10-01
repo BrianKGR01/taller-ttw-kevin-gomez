@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://www.drinksonchain.com",
+    "dominio": "drinksonchain.com",
+    "slug": "drinksonchain-com",
+    "titulo": "Drinks on Chain · Cada botella, con su lugar y su historia.",
+    "descripcion": "Vinos y singanis de los valles altos de Tarija y Cinti, verificados de la parcela a la copa. Adquiérelos directamente de la bodega, sigue su elaboración y recógelos en un punto de canje.",
+    "sitio": "Drinks on Chain",
+    "imagen": "assets/enlaces/drinksonchain-com.webp",
+    "ok": true
+  },
+  {
+    "url": "https://bodegas.drinksonchain.com",
+    "dominio": "bodegas.drinksonchain.com",
+    "slug": "bodegas-drinksonchain-com",
+    "titulo": "Drinks on Chain · El mapa de las bodegas de altura de Bolivia.",
+    "descripcion": "El mapa grabado de las bodegas de altura de Bolivia: parcelas de Tarija y el Valle de Cinti, bodegas de la red, puntos de canje y acceso para socios.",
+    "sitio": "Drinks on Chain",
+    "imagen": "assets/enlaces/bodegas-drinksonchain-com.webp",
+    "ok": true
+  },
+  {
+    "url": "https://www.devbro.xyz",
+    "dominio": "devbro.xyz",
+    "slug": "devbro-xyz",
+    "titulo": "DevBro Solutions — Tu idea, funcionando, en tres semanas",
+    "descripcion": "Software factory en Santa Cruz de la Sierra. Construimos tu producto en producción en tres a seis semanas, con precio cerrado. El código es tuyo.",
+    "sitio": "DevBro Solutions",
+    "imagen": "assets/enlaces/devbro-xyz.webp",
+    "ok": true
+  }
+]

@@ -1,0 +1,97 @@
+/* ── Diagrama del ciclo (SVG con tokens) ───────────────────────────────────── */
+
+.ciclo {
+  margin: 0;
+}
+.ciclo__svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  overflow: visible;
+}
+.ciclo__svg--v {
+  display: none;
+}
+.ciclo__nodo {
+  cursor: pointer;
+}
+.ciclo__aro {
+  fill: var(--superficie);
+  stroke: var(--c);
+  stroke-width: 3;
+  transition:
+    fill var(--mov-medio) var(--curva-estandar),
+    filter var(--mov-medio) var(--curva-estandar);
+}
+.ciclo__num {
+  fill: var(--tinta-fuerte);
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  transition: fill var(--mov-medio) var(--curva-estandar);
+}
+.ciclo__etq {
+  fill: var(--tinta);
+  font-family: var(--fuente-display);
+  font-weight: 700;
+}
+.ciclo__arista,
+.ciclo__lazo {
+  fill: none;
+  stroke: var(--c, var(--borde-fuerte));
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.ciclo__lazo {
+  stroke: var(--borde-fuerte);
+  stroke-dasharray: 0.012 0.018;
+}
+a:hover .ciclo__aro,
+a:focus-visible .ciclo__aro {
+  fill: var(--fase-suave);
+}
+
+/* Fase iluminada: las demás bajan. */
+.ciclo[data-actual] .ciclo__nodo:not([data-actual]) {
+  opacity: 0.5;
+}
+.ciclo__nodo[data-actual] .ciclo__aro {
+  fill: var(--c);
+}
+.ciclo__nodo[data-actual] .ciclo__num {
+  fill: var(--realce-tinta);
+}
+
+/* Se dibuja paso a paso al activarse la diapositiva. */
+html[data-uso='presentacion'] .diap[data-activa] .ciclo__arista,
+html[data-uso='presentacion'] .diap[data-activa] .ciclo__lazo {
+  animation: ciclo-aparece var(--mov-lento) var(--curva-suave) both;
+  animation-delay: calc(var(--mov-medio) + var(--i, 0) * var(--mov-escalon) * 4);
+}
+html[data-uso='presentacion'] .diap[data-activa] .ciclo__nodo {
+  animation: ciclo-nodo var(--mov-lento) var(--curva-salida) both;
+  animation-delay: calc(var(--i, 0) * var(--mov-escalon) * 4);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ciclo-aparece {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ciclo-nodo {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@media (max-width: 820px) {
+  .ciclo:not(.ciclo--mini) .ciclo__svg--h {
+    display: none;
+  }
+  .ciclo:not(.ciclo--mini) .ciclo__svg--v {
+    display: block;
+    max-inline-size: var(--ancho-lectura-texto);
+    margin-inline: auto;
+  }
+}

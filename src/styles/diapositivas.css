@@ -1,0 +1,176 @@
+/* ── Escenario y diapositivas (modo presentación) ─────────────────────────── */
+
+.escenario {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  outline: none;
+}
+.bloque {
+  display: contents;
+}
+.bloque__cab {
+  display: none;
+}
+
+.diap {
+  position: absolute;
+  inset: 0;
+  display: none;
+  padding-block: calc(var(--proy-barra) + var(--proy-margen-y)) calc(var(--proy-barra) + var(--proy-margen-y) * 0.5);
+  padding-inline: var(--proy-margen-x);
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.diap__cuerpo {
+  inline-size: 100%;
+  max-inline-size: var(--ancho-amplio);
+  margin-inline: auto;
+  min-block-size: 0;
+}
+.diap__id {
+  display: none;
+}
+
+html[data-uso='presentacion'] .diap[data-activa],
+html[data-uso='presentacion'] .diap[data-saliendo] {
+  display: grid;
+  align-content: start;
+  align-content: safe center;
+}
+html[data-uso='presentacion'] .diap[data-activa] {
+  z-index: 2;
+  animation: diap-entra var(--mov-medio) var(--curva-salida) both;
+}
+html[data-uso='presentacion'] .diap[data-saliendo] {
+  z-index: 1;
+  pointer-events: none;
+  animation: diap-sale var(--mov-rapido) var(--curva-estandar) both;
+}
+.diap[data-dir='sig'] {
+  --dx: 0;
+  --dy: var(--desp-corto);
+}
+.diap[data-dir='ant'] {
+  --dx: 0;
+  --dy: calc(var(--desp-corto) * -1);
+}
+.diap[data-dir='bloque-sig'] {
+  --dx: var(--desp-medio);
+  --dy: 0;
+}
+.diap[data-dir='bloque-ant'] {
+  --dx: calc(var(--desp-medio) * -1);
+  --dy: 0;
+}
+@keyframes diap-entra {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--dx, 0), var(--dy, 0), 0);
+  }
+}
+@keyframes diap-sale {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Entrada escalonada (stagger), estilo keynote: desplazamiento corto y opacidad, sin rebote. */
+html[data-uso='presentacion'] .diap[data-activa] .ent {
+  animation: ent var(--mov-lento) var(--curva-salida) both;
+  animation-delay: calc(var(--mov-rapido) + var(--i, 0) * var(--mov-escalon));
+}
+@keyframes ent {
+  from {
+    opacity: 0;
+    transform: translateY(var(--desp-corto));
+  }
+}
+
+/* Revelado por pasos. */
+html[data-uso='presentacion'] .diap [data-paso] {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(var(--desp-corto));
+  transition:
+    opacity var(--mov-medio) var(--curva-estandar),
+    transform var(--mov-medio) var(--curva-salida),
+    visibility 0s linear var(--mov-medio);
+}
+html[data-uso='presentacion'] .diap [data-paso][data-visto] {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
+}
+
+/* Cabeza común: etiqueta, título, subtítulo. */
+.cabeza {
+  display: grid;
+  gap: var(--proy-gap);
+  margin-block-end: var(--proy-gap-grande);
+}
+
+/* Nota "Si no eres dev". */
+.sin-dev {
+  max-inline-size: var(--proy-ancho-texto);
+  margin-block-start: var(--proy-gap-grande);
+  padding: var(--esp-3) var(--esp-4);
+  border-inline-start: var(--esp-1) solid var(--realce);
+  border-radius: var(--radio-chico);
+  background: var(--realce-suave);
+  font-size: calc(var(--proy-cuerpo) * 0.82);
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta);
+}
+.sin-dev strong {
+  color: var(--tinta-fuerte);
+}
+
+/* Video de atmósfera. */
+.video-fondo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  opacity: var(--video-opacidad);
+  mix-blend-mode: var(--video-mezcla);
+  filter: var(--video-filtro);
+  pointer-events: none;
+  -webkit-mask-image: var(--m-halo);
+  mask-image: var(--m-halo);
+}
+
+/* Logos oficiales: cada uno en el modo que le corresponde por su contraste. */
+.logo {
+  display: none;
+  inline-size: auto;
+  block-size: var(--alto-logo);
+}
+html:not([data-modo]) .logo--oscuro {
+  display: block;
+}
+@media (prefers-color-scheme: light) {
+  html:not([data-modo]) .logo--oscuro {
+    display: none;
+  }
+  html:not([data-modo]) .logo--claro {
+    display: block;
+  }
+}
+html[data-modo='oscuro'] .logo--oscuro {
+  display: block;
+}
+html[data-modo='oscuro'] .logo--claro {
+  display: none;
+}
+html[data-modo='claro'] .logo--oscuro {
+  display: none;
+}
+html[data-modo='claro'] .logo--claro {
+  display: block;
+}

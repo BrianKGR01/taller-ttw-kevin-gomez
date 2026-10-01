@@ -1,0 +1,321 @@
+/*
+ * CAPA 2 — SEMANTICOS
+ *
+ * Que significa cada color en la interfaz. Un tema redefine EXCLUSIVAMENTE
+ * esta capa.
+ *
+ * Se declaran como propiedades personalizadas planas dentro de selectores con
+ * alcance, y no dentro de `@theme`. Ese detalle no es estilistico: `@theme`
+ * emite siempre en `:root` y no se puede anidar, asi que con el los temas no
+ * podrian convivir en la misma pagina. Ver 01-sistema-de-diseno.md.
+ *
+ * `:root` lleva los valores de `gdg`. Eso da tres cosas de una: el tema por
+ * defecto, el fallback ante un tema inexistente, y la
+ * garantia de que todo `var(--…)` resuelva aunque un nodo quede fuera de todo
+ * `[data-tema]`.
+ *
+ * ---------------------------------------------------------------------------
+ * MODO Y TEMA SON DOS EJES DISTINTOS. No son alternativas.
+ *
+ *   data-tema  →  QUE identidad    gdg
+ *   data-modo  →  QUE polaridad    claro · oscuro · (ausente = la del sistema)
+ *
+ * La identidad de la casa tiene las DOS polaridades y las expresa con
+ * `light-dark()`.
+ *
+ * Cada token de color se declara dos veces:
+ *
+ *   --superficie: var(--gdg-negro);                                (respaldo)
+ *   --superficie: light-dark(var(--gdg-blanco), var(--gdg-negro));
+ *
+ * La primera linea es lo que ve un navegador que no entiende `light-dark()`.
+ * Degrada a oscuro, no a roto, y eso importa: parte del publico entra desde
+ * equipos que no se renuevan. La segunda gana donde si se entiende.
+ *
+ * Se eligio esto sobre duplicar el bloque entero dentro de un `@media` por una
+ * razon concreta: asi los dos valores quedan UNO AL LADO DEL OTRO. El bug mas
+ * caro de la fase anterior fue un token que hacia dos trabajos y nadie lo vio
+ * porque los dos valores nunca estaban a la vista al mismo tiempo.
+ *
+ * Los cuatro tokens que NO son color -los tres gradientes y el resplandor- no
+ * pueden usar `light-dark()`, asi que van en un bloque aparte mas abajo.
+ * ---------------------------------------------------------------------------
+ *
+ * ---------------------------------------------------------------------------
+ * EL CONTRATO. Todo tema declara este set completo, en este orden.
+ * Agregar un token obliga a declararlo en los tres lugares: aca, en cada tema,
+ * y en el puente de utilidades.css. La verificacion de completitud lo exige.
+ * ---------------------------------------------------------------------------
+ *
+ *   superficie            fondo de pagina
+ *   superficie-elevada    tarjetas, bloques que suben
+ *   superficie-hundida    pozos, bloques de codigo
+ *   tinta                 texto corrido
+ *   tinta-fuerte          titulos
+ *   tinta-suave           metadatos, texto secundario
+ *   realce                marcas chicas de alta visibilidad
+ *   realce-tinta          texto sobre el realce
+ *   realce-suave          fondo tenue derivado del realce
+ *   enlace                enlaces en reposo
+ *   enlace-hover          enlaces al pasar el puntero
+ *   borde                 separadores y contornos normales
+ *   borde-fuerte          contornos que tienen que verse
+ *   foco                  anillo de foco de teclado
+ *   marca-trazo           los trazos negros del isotipo: SOLO negro o blanco
+ *   gradiente-hero        atmosfera de fondo del hero
+ *   gradiente-borde       ESTRUCTURA: filetes, bordes de pastilla, columnas
+ *   gradiente-titular     RELLENO DE TEXTO: el nombre del evento en el hero
+ *   resplandor            box-shadow de la accion principal
+ *   fase-1 … fase-6       color de cada fase del ciclo (extension del taller)
+ *   exito                 confirmacion de una accion (extension del taller)
+ *   fuente-display        titulos de hero y de seccion
+ *   fuente-texto          texto corrido
+ *   fuente-mono           metadatos, fechas, etiquetas
+ */
+
+:root,
+[data-tema='gdg'] {
+  /*
+   * `light dark` significa «este arbol sabe vivir en los dos modos y sigue
+   * al sistema». Es lo que hace funcionar a `light-dark()` de abajo, y de
+   * paso pone en el modo correcto los controles nativos y el scroll.
+   */
+  color-scheme: light dark;
+
+  --superficie: var(--gdg-negro);
+  --superficie: light-dark(var(--gdg-blanco), var(--gdg-negro));
+  --superficie-elevada: var(--gdg-black-02);
+  --superficie-elevada: light-dark(var(--gdg-gris-05), var(--gdg-black-02));
+  --superficie-hundida: color-mix(in srgb, var(--gdg-negro) 70%, var(--gdg-black-02));
+  --superficie-hundida: light-dark(
+    var(--gdg-gris-10),
+    color-mix(in srgb, var(--gdg-negro) 70%, var(--gdg-black-02))
+  );
+
+  --tinta: var(--gdg-off-white);
+  --tinta: light-dark(var(--gdg-gris-80), var(--gdg-off-white));
+  --tinta-fuerte: var(--gdg-blanco);
+  --tinta-fuerte: light-dark(var(--gdg-casi-negro), var(--gdg-blanco));
+  --tinta-suave: color-mix(in srgb, var(--gdg-off-white) 62%, var(--gdg-negro));
+  --tinta-suave: light-dark(
+    var(--gdg-gris-55),
+    color-mix(in srgb, var(--gdg-off-white) 62%, var(--gdg-negro))
+  );
+
+  --realce: var(--gdg-blue-500);
+  --realce: light-dark(var(--gdg-blue-600), var(--gdg-blue-500));
+  --realce-tinta: var(--gdg-negro);
+  --realce-tinta: light-dark(var(--gdg-blanco), var(--gdg-negro));
+  --realce-suave: color-mix(in srgb, var(--gdg-blue-500) 18%, var(--gdg-negro));
+  --realce-suave: light-dark(
+    color-mix(in srgb, var(--gdg-blue-600) 10%, var(--gdg-blanco)),
+    color-mix(in srgb, var(--gdg-blue-500) 18%, var(--gdg-negro))
+  );
+
+  --enlace: var(--gdg-halftone-blue);
+  --enlace: light-dark(var(--gdg-blue-700), var(--gdg-halftone-blue));
+  --enlace-hover: var(--gdg-blanco);
+  --enlace-hover: light-dark(var(--gdg-casi-negro), var(--gdg-blanco));
+
+  --borde: color-mix(in srgb, var(--gdg-off-white) 18%, var(--gdg-negro));
+  --borde: light-dark(
+    var(--gdg-gris-15),
+    color-mix(in srgb, var(--gdg-off-white) 18%, var(--gdg-negro))
+  );
+  --borde-fuerte: color-mix(in srgb, var(--gdg-off-white) 42%, var(--gdg-negro));
+  --borde-fuerte: light-dark(
+    var(--gdg-gris-50),
+    color-mix(in srgb, var(--gdg-off-white) 42%, var(--gdg-negro))
+  );
+
+  /*
+   * El foco cambia de naturaleza, no solo de tono. En oscuro es amarillo
+   * halftone, que sobre negro grita; sobre blanco ese amarillo da 1.4:1 y
+   * seria un anillo de foco invisible. En claro es el azul de accion.
+   */
+  --foco: var(--gdg-halftone-yellow);
+  --foco: light-dark(var(--gdg-blue-600), var(--gdg-halftone-yellow));
+
+  /*
+   * Los trazos negros del isotipo. NO es --tinta-fuerte: vale exactamente
+   * lo que valen las dos variantes que el Community Kit publica, negro puro
+   * y blanco puro, y ninguna otra cosa. Ver el isotipo de GDG.
+   */
+  --marca-trazo: var(--gdg-blanco);
+  --marca-trazo: light-dark(var(--gdg-negro), var(--gdg-blanco));
+
+  /*
+   * TRES roles de gradiente, no uno.
+   *
+   * Hasta la prueba de estres del tema claro habia un solo `--gradiente-borde`
+   * haciendo dos trabajos —dibujar estructura y rellenar texto— y en oscuro los
+   * dos quedaban bien con el mismo valor, asi que nadie lo noto. En claro no:
+   * el brochure usa los cuatro colores PLANOS como marcadores estructurales y
+   * NO tiene un solo degradado, y menos todavia texto relleno con uno. Un token
+   * no puede satisfacer las dos cosas a la vez.
+   *
+   *   hero       atmosfera de fondo, puede nacer de la superficie
+   *   borde      estructura: filetes, bordes de pastilla, columna del historial
+   *   titular    relleno de texto; en claro es un color solido escrito como
+   *              gradiente de una parada, para que quien lo consume no cambie
+   */
+  --gradiente-hero: var(--g-espectro);
+  --gradiente-borde: var(--g-espectro);
+  --gradiente-titular: var(--g-espectro);
+
+  /*
+   * El resplandor de la accion principal. Es un token y no un valor escrito en
+   * el boton justamente porque en claro tiene que poder apagarse: un halo de
+   * color sobre blanco ensucia, y el brochure no tiene ninguno.
+   */
+  --resplandor: 0 0 2.5rem -0.5rem color-mix(in srgb, var(--gdg-halftone-blue) 55%, transparent);
+
+  /*
+   * EXTENSION DEL TALLER — atmosfera de fondo. No son colores, asi que no
+   * pueden usar light-dark(): se redefinen abajo para el modo claro, igual que
+   * --resplandor. La malla de gradiente respira; la red de nodos es mas tenue.
+   */
+  --atmosfera-opacidad: 0.22;
+  --red-opacidad: 0.5;
+  --video-opacidad: 0.5;
+  --video-mezcla: screen;
+  --video-filtro: none;
+
+  /*
+   * Tres roles y no hay un cuarto. Van en la capa semantica —y no en la de
+   * tipografia— para que un tema pueda cambiarlos, igual que cambia un color.
+   *
+   * Las pilas de respaldo son fuentes reales y parecidas, no `sans-serif` a
+   * secas: si la de marca no carga, la metrica de la pagina no debe cambiar.
+   * Ver ADR-002.
+   *
+   * En mono el respaldo ademas cubre un hueco real: Google Sans Mono no trae
+   * Latin Extendido-A, y el respaldo de CSS funciona por glifo.
+   */
+  --fuente-display: 'Google Sans', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --fuente-texto: 'Google Sans', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --fuente-mono: 'Google Sans Mono', ui-monospace, 'JetBrains Mono', 'Roboto Mono', monospace;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * EXTENSION DEL TALLER — COLOR POR FASE
+ *
+ * El ciclo tiene seis fases y cada una tiene SIEMPRE el mismo color, en todo
+ * el taller: el publico ubica en que fase esta sin leer. Recorre el espectro:
+ *
+ *   1 Spec funcional   azul      4 Roadmap por hitos   verde
+ *   2 Spec tecnica     rojo      5 Ejecucion           cian
+ *   3 Reglas del juego amarillo  6 Donde vive          violeta
+ *
+ * En oscuro usan el juego core/halftone; en claro, el juego para fondo claro
+ * (ver primitivos.css). Mismo criterio que --realce: el mismo rol, otro valor.
+ *
+ * Reglas de uso: sirven para graficos, filetes, numerales grandes y marcadores
+ * (umbral de 3:1). El texto pequeno sigue siendo --tinta. Un elemento que
+ * pertenece a una fase declara data-fase="N" y consume --fase-actual.
+ *
+ * --exito confirma una accion (copiar, descargar). No es una fase.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+:root,
+[data-tema='gdg'] {
+  --fase-1: var(--gdg-blue-500);
+  --fase-1: light-dark(var(--gdg-blue-600), var(--gdg-blue-500));
+  --fase-2: var(--gdg-red-500);
+  --fase-2: light-dark(var(--gdg-red-600), var(--gdg-red-500));
+  --fase-3: var(--gdg-yellow-600);
+  --fase-3: light-dark(var(--gdg-yellow-900), var(--gdg-yellow-600));
+  --fase-4: var(--gdg-green-500);
+  --fase-4: light-dark(var(--gdg-green-700), var(--gdg-green-500));
+  --fase-5: var(--gdg-halftone-blue);
+  --fase-5: light-dark(var(--gdg-cyan-700), var(--gdg-halftone-blue));
+  --fase-6: var(--gdg-halftone-purple);
+  --fase-6: light-dark(var(--gdg-purple-700), var(--gdg-halftone-purple));
+
+  --exito: var(--gdg-halftone-green);
+  --exito: light-dark(var(--gdg-green-700), var(--gdg-halftone-green));
+
+  /* Sin fase (portada, gancho, cierre): el color de accion. */
+  --fase-actual: var(--realce);
+
+  /* Velo translucido para barras flotantes sobre el fondo vivo. */
+  --velo: color-mix(in srgb, var(--superficie) 78%, transparent);
+}
+
+/*
+ * --fase-suave se recalcula en cada elemento con fase (un custom property que
+ * referencia a otro se resuelve donde se declara, no donde se usa).
+ */
+:root,
+[data-fase] {
+  --fase-suave: color-mix(in srgb, var(--fase-actual) 16%, var(--superficie));
+}
+
+[data-fase='1'] { --fase-actual: var(--fase-1); }
+[data-fase='2'] { --fase-actual: var(--fase-2); }
+[data-fase='3'] { --fase-actual: var(--fase-3); }
+[data-fase='4'] { --fase-actual: var(--fase-4); }
+[data-fase='5'] { --fase-actual: var(--fase-5); }
+[data-fase='6'] { --fase-actual: var(--fase-6); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * EL MODO CLARO DE LA IDENTIDAD DE LA CASA
+ *
+ * Solo lo que `light-dark()` no puede expresar: los tres gradientes y el
+ * resplandor. El resto ya cambio solo, arriba, en la misma linea de cada token.
+ *
+ * EL HALLAZGO QUE DEFINE ESTE BLOQUE: el brochure 2026 NO TIENE UN SOLO
+ * GRADIENTE. En claro los cuatro colores de Google se usan PLANOS y como
+ * marcadores estructurales. El mismo rol —«el espectro»— se dibuja distinto
+ * segun la polaridad, y por eso aca `--gradiente-borde` es de paradas duras y
+ * `--gradiente-titular` es un color solido escrito como gradiente de una sola
+ * parada: para que quien lo consume no tenga que saber donde esta.
+ *
+ * Se declara dos veces porque hay dos formas de llegar al modo claro: que lo
+ * pida el sistema, o que lo pida la persona. Son cuatro tokens; duplicarlos es
+ * mas barato y mas legible que cualquier indireccion para evitarlo.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-modo='oscuro']) {
+    --gradiente-hero: var(--g-lavado-claro);
+    --gradiente-borde: var(--g-espectro-plano);
+    --gradiente-titular: var(--g-tinta-solida);
+    --resplandor: none;
+    --atmosfera-opacidad: 0.85;
+    --red-opacidad: 0.4;
+    --video-opacidad: 0.5;
+    --video-mezcla: multiply;
+    --video-filtro: invert(1) hue-rotate(180deg) saturate(1.2);
+  }
+}
+
+[data-modo='claro'] {
+  --gradiente-hero: var(--g-lavado-claro);
+  --gradiente-borde: var(--g-espectro-plano);
+  --gradiente-titular: var(--g-tinta-solida);
+  --resplandor: none;
+  --atmosfera-opacidad: 0.85;
+  --red-opacidad: 0.4;
+  --video-opacidad: 0.5;
+  --video-mezcla: multiply;
+  --video-filtro: invert(1) hue-rotate(180deg) saturate(1.2);
+}
+
+/*
+ * EL CONTROL MANUAL.
+ *
+ * `color-scheme` es lo unico que hace falta cambiar: `light-dark()` lo lee, y
+ * de paso quedan en el modo correcto los controles nativos y el scroll.
+ *
+ * No lleva `:root` adelante a proposito. Asi el modo tambien se puede anidar en
+ * una seccion suelta, igual que un tema, y la pagina de referencia puede
+ * mostrar los dos al lado sin trucos.
+ */
+[data-modo='claro'] {
+  color-scheme: light;
+}
+
+[data-modo='oscuro'] {
+  color-scheme: dark;
+}

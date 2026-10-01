@@ -1,0 +1,88 @@
+/*
+ * CAPA 3 — EL PUENTE HACIA LAS UTILIDADES
+ *
+ * Mapea el espacio de nombres de Tailwind a los tokens semanticos. Es lo unico
+ * que los componentes tocan, y lo hacen a traves de clases como `bg-superficie`
+ * o `text-tinta-suave`.
+ *
+ * `inline` NO es opcional ni un detalle de rendimiento. Con `inline`, la
+ * utilidad recibe el TEXTO de la definicion:
+ *
+ *     .bg-superficie { background-color: var(--superficie) }
+ *
+ * y por lo tanto resuelve en el elemento donde se usa, tomando el `[data-modo]`
+ * ancestro mas cercano. Sin `inline`, Tailwind hornea el valor de la raiz y una
+ * seccion con otro modo anidado se veria con los colores equivocados, sin
+ * ningun error que lo delate.
+ *
+ * 
+ */
+
+@theme inline {
+  --color-superficie: var(--superficie);
+  --color-superficie-elevada: var(--superficie-elevada);
+  --color-superficie-hundida: var(--superficie-hundida);
+
+  --color-tinta: var(--tinta);
+  --color-tinta-fuerte: var(--tinta-fuerte);
+  --color-tinta-suave: var(--tinta-suave);
+
+  --color-realce: var(--realce);
+  --color-realce-tinta: var(--realce-tinta);
+  --color-realce-suave: var(--realce-suave);
+
+  --color-enlace: var(--enlace);
+  --color-enlace-hover: var(--enlace-hover);
+
+  --color-borde: var(--borde);
+  --color-borde-fuerte: var(--borde-fuerte);
+
+  --color-foco: var(--foco);
+
+  --color-fase-1: var(--fase-1);
+  --color-fase-2: var(--fase-2);
+  --color-fase-3: var(--fase-3);
+  --color-fase-4: var(--fase-4);
+  --color-fase-5: var(--fase-5);
+  --color-fase-6: var(--fase-6);
+  --color-fase-actual: var(--fase-actual);
+  --color-fase-suave: var(--fase-suave);
+  --color-exito: var(--exito);
+  --color-velo: var(--velo);
+
+  --font-display: var(--fuente-display);
+  --font-texto: var(--fuente-texto);
+  --font-mono: var(--fuente-mono);
+
+  /* --- LAYOUT -------------------------------------------------------------
+   * Los espacios de nombres que Tailwind si expone. El ritmo vertical no esta
+   * aca porque no puede estarlo: lo aplica <Seccion>. Ver 01-sistema-de-diseno.md.
+   *
+   * Los defaults de Tailwind (max-w-2xl, text-4xl...) siguen existiendo y sin
+   * usarse. Vaciar el espacio de nombres los dejaria como clases que existen y
+   * no hacen nada, que es un fallo silencioso; lo que los mantiene fuera del
+   * codigo es `verificar-layout.mjs`, que falla con un mensaje.
+   */
+  --container-prosa: var(--ancho-prosa);
+  --container-contenido: var(--ancho-contenido);
+  --container-amplio: var(--ancho-amplio);
+
+  --text-hero: var(--escala-hero);
+  --text-hero--line-height: var(--interlinea-hero);
+  --text-titulo: var(--escala-titulo);
+  --text-titulo--line-height: var(--interlinea-titulo);
+  --text-subtitulo: var(--escala-subtitulo);
+  --text-subtitulo--line-height: var(--interlinea-subtitulo);
+  --text-cuerpo-lg: var(--escala-cuerpo-lg);
+  --text-cuerpo-lg--line-height: var(--interlinea-cuerpo);
+  --text-cuerpo: var(--escala-cuerpo);
+  --text-cuerpo--line-height: var(--interlinea-cuerpo);
+  --text-nota: var(--escala-nota);
+  --text-nota--line-height: var(--interlinea-nota);
+  --text-etiqueta: var(--escala-etiqueta);
+  --text-etiqueta--line-height: var(--interlinea-nota);
+
+  --radius-pastilla: var(--radio-pastilla);
+  --radius-tarjeta: var(--radio-tarjeta);
+  --radius-chico: var(--radio-chico);
+}
