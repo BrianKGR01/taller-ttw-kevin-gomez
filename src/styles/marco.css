@@ -243,12 +243,10 @@ html[data-ocioso][data-uso='presentacion'] .barra,
 html[data-ocioso][data-uso='presentacion'] .pie__nav,
 html[data-ocioso][data-uso='presentacion'] .pie__numero {
   opacity: 0;
-  pointer-events: none;
 }
 html[data-ocioso][data-uso='presentacion'] .barra:focus-within,
 html[data-ocioso][data-uso='presentacion'] .pie:focus-within .pie__nav {
   opacity: 1;
-  pointer-events: auto;
 }
 html[data-embebido] .barra,
 html[data-embebido] .pie,
