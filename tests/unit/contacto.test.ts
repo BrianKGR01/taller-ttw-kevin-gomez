@@ -119,7 +119,8 @@ async function decodificar(svg: string, lado: number) {
 
 describe('QR de la última diapositiva', () => {
   const config = readFileSync(join(RAIZ, 'astro.config.mjs'), 'utf8');
-  const sitio = /process\.env\.SITE_URL \?\? '([^']+)'/.exec(config)?.[1];
+  // El respaldo de `site` (ADR-017): la URL que se usa cuando no hay SITE_URL ni variable de Vercel.
+  const sitio = /: '(https:\/\/[^']+)'\);/.exec(config)?.[1];
   const url = new URL('/', sitio).href;
 
   it('lee la URL de producción de astro.config.mjs', () => {
