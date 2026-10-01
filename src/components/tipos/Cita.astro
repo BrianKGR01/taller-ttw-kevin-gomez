@@ -6,13 +6,19 @@ interface Props {
   etiquetaBloque: string;
 }
 const { d } = Astro.props;
+const terminal: string | undefined = d.datos.prompt;
 ---
 
-<div class="texto">
+<div class:list={['cita', { 'cita--terminal': Boolean(terminal) }]}>
   <header class="cabeza">
     {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
-    <h3 class="titulo ent" style="--i:1">{d.titulo}</h3>
-    {d.subtitulo && <p class="subtitulo ent" style="--i:2">{d.subtitulo}</p>}
+    {d.titulo && <h3 class="titulo ent" style="--i:1">{d.titulo}</h3>}
   </header>
-  <div class="texto__cuerpo ent" style="--i:3" set:html={d.html} />
+  {terminal && (
+    <p class="cita__terminal ent" style="--i:2" data-teclear-linea>
+      <span class="prompt-signo" aria-hidden="true">&gt;</span>
+      <span data-teclear-texto>{terminal}</span>
+    </p>
+  )}
+  <div class="cita__cuerpo ent" style="--i:3" set:html={d.html} />
 </div>

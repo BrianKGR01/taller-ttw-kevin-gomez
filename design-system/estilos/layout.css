@@ -124,7 +124,7 @@
   --proy-gigante: clamp(2.25rem, min(7vw, 11svh), 7rem);
   --proy-titulo: clamp(2rem, min(5.2vw, 8.4svh), 5.5rem);
   --proy-subtitulo: clamp(1.375rem, min(2.6vw, 4.4svh), 2.75rem);
-  --proy-cuerpo: clamp(1.0625rem, min(2vw, 3.5svh), 2.125rem);
+  --proy-cuerpo: clamp(1.0625rem, min(2.15vw, 3.8svh), 2.25rem);
   --proy-codigo: clamp(0.9375rem, min(1.5vw, 2.7svh), 1.5rem);
   --proy-etiqueta: clamp(0.75rem, min(1.2vw, 2svh), 1.125rem);
 
@@ -199,4 +199,41 @@
   --ancho-lista: 70rem;
   --ancho-remate: 78rem;
   --ancho-foto-movil: 20rem;
+}
+
+/* Tokens de cita, libros y ejecución (diapositivas de texto). */
+:root {
+  --ancho-codigo-min: 30rem;
+  --alto-tapa: min(46svh, 26rem);
+  --ancho-cita: 62rem;
+  --ancho-tarjeta-cita: 56rem;
+  --mascara-ejecucion: 50%;
+}
+
+:root {
+  /* Documento (recorrido de cámara): ancho natural de la hoja. En celular entra más angosta para que el zoom la lea. */
+  --ancho-hoja-doc: 44rem;
+  --ancho-hoja-doc-movil: 20rem;
+  --alto-indice-doc: 34rem;
+}
+
+/* Cierre: QR grande en proyección (manda la altura, igual que la escala --proy-*). */
+:root { --lado-qr-proy: min(46svh, 26rem); }
+
+/* Tamaño base de las miniaturas de la vista de presentador (el 1366×768 de diseño). */
+:root {
+  --miniatura-ancho: 1366px;
+  --miniatura-alto: 768px;
+}
+
+:root {
+  --presentador-bloque-min: 16rem;
+  --presentador-estado-min: 12rem;
+}
+
+/* Cierre: ancho de la columna de contacto (una acción por fila). */
+:root { --ancho-contacto: 28rem; }
+
+:root {
+  --fases-texto-max: 7.5rem;
 }

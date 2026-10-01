@@ -21,7 +21,7 @@ Las decisiones técnicas y de diseño se registran como ADR en `design-system/de
 
 - `pnpm dev` · `pnpm build` · `pnpm preview`
 - `pnpm test` (unitarios) · `pnpm test:e2e` (E2E) · `pnpm typecheck`
-- `pnpm datos:og` (metadatos de enlaces) · `pnpm datos:qr` (QR de la URL de producción)
+- `pnpm datos:og` (metadatos de enlaces) (el QR se genera en el build a partir de `site`)
 
 ## Reglas del sistema de diseño
 

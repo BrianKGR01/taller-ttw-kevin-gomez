@@ -36,6 +36,24 @@ a {
   color: var(--enlace);
   text-underline-offset: 0.2em;
 }
+/* Un enlace dentro de texto no se distingue solo por el color. */
+a:not([class]) {
+  text-decoration-line: underline;
+  text-decoration-thickness: from-font;
+}
+.casilla {
+  display: inline-block;
+  inline-size: 0.9em;
+  block-size: 0.9em;
+  margin-inline-end: 0.35em;
+  vertical-align: -0.1em;
+  border: var(--filete) solid var(--borde-fuerte);
+  border-radius: var(--radio-chico);
+}
+.casilla--hecha {
+  background: var(--exito);
+  border-color: var(--exito);
+}
 a:hover {
   color: var(--enlace-hover);
 }
@@ -185,6 +203,13 @@ a:hover {
   .fondo__malla {
     animation: none;
   }
+  /* Sin movimiento decorativo tampoco hay esperas: todo aparece ya, en su estado final. */
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0s !important;
+    transition-delay: 0s !important;
+  }
 }
 
 /* ── Cambio de tema animado ─────────────────────────────────────────────── */
@@ -223,15 +248,20 @@ html[data-vt='tema']::view-transition-old(root) {
   }
 }
 
-.solo-escritorio {
+.accion.solo-escritorio {
   display: none;
 }
 @media (min-width: 821px) {
-  .solo-escritorio {
+  .accion.solo-escritorio {
     display: inline-flex;
   }
 }
 
 [hidden] {
   display: none !important;
+}
+
+/* Los enlaces dibujados dentro de un SVG (nodos del ciclo) no llevan subrayado. */
+svg a {
+  text-decoration: none;
 }

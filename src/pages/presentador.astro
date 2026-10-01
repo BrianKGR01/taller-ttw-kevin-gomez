@@ -1,0 +1,83 @@
+---
+import Base from '../layouts/Base.astro';
+import Isotipo from '../components/Isotipo.astro';
+import { cargarBloques, metaDeck } from '../lib/deck';
+import '../styles/presentador.css';
+
+const bloques = await cargarBloques();
+const datos = {
+  deck: metaDeck(bloques),
+  bloques: bloques.map((b) => ({
+    numero: b.numero,
+    titulo: b.titulo,
+    corto: b.corto,
+    fase: b.fase,
+    tiempo30: b.tiempo30,
+    tiempo60: b.tiempo60,
+    notaHtml: b.notaHtml,
+    diapos: b.diapos.map((d) => ({ id: d.id, titulo: d.titulo ?? d.etiqueta ?? '', notas: d.notas ?? '' })),
+  })),
+};
+---
+
+<Base titulo="Vista de presentador · IA aplicada al desarrollo de software" descripcion="Vista de presentador del taller: diapositiva actual y siguiente, notas, tiempos y cronómetro." bodyClass="pagina-presentador">
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+  <Isotipo />
+  <div class="pres" data-presentador>
+    <header class="pres__cab">
+      <div class="pres__reloj" role="group" aria-label="Cronómetro">
+        <output class="pres__tiempo" data-reloj aria-live="off">00:00</output>
+        <button type="button" class="accion accion--principal" data-reloj-alternar>Iniciar</button>
+        <button type="button" class="accion accion--secundaria" data-reloj-reiniciar>Reiniciar</button>
+      </div>
+
+      <div class="pres__bloque" data-fase-bloque>
+        <p class="pres__bloque-nombre" data-bloque-nombre>—</p>
+        <p class="pres__bloque-tiempo"><output data-bloque-reloj>00:00</output> <span class="pres__de">de</span> <span data-bloque-presupuesto>—</span></p>
+        <div class="progreso" role="progressbar" aria-label="Tiempo del bloque" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progreso__barra" data-bloque-barra></div></div>
+      </div>
+
+      <div class="pres__version" role="group" aria-label="Versión del guion">
+        <button type="button" class="accion accion--secundaria" data-version="30" aria-pressed="true">30′ reales</button>
+        <button type="button" class="accion accion--secundaria" data-version="60" aria-pressed="false">Guion de 60′</button>
+      </div>
+    </header>
+
+    <section class="pres__escenas" aria-label="Diapositivas">
+      <figure class="pres__actual">
+        <figcaption class="etiqueta">Ahora · <span data-id-actual>—</span></figcaption>
+        <div class="pres__marco" data-marco inert>
+          <iframe class="pres__iframe" data-iframe="actual" title="Diapositiva actual" src="/?modo=presentacion&embebido=1#/0/1" loading="eager"></iframe>
+        </div>
+      </figure>
+      <figure class="pres__sig">
+        <figcaption class="etiqueta">Siguiente · <span data-id-sig>—</span></figcaption>
+        <div class="pres__marco" data-marco inert>
+          <iframe class="pres__iframe" data-iframe="sig" title="Diapositiva siguiente" src="/?modo=presentacion&embebido=1#/0/2" loading="eager"></iframe>
+        </div>
+      </figure>
+    </section>
+
+    <section class="pres__notas" aria-labelledby="notas-titulo">
+      <h2 id="notas-titulo" class="etiqueta">Notas del expositor</h2>
+      <p class="pres__notas-diapo" data-notas-diapo></p>
+      <div class="pres__notas-bloque" data-notas-bloque></div>
+      <details class="pres__recorte">
+        <summary>Si vas corto de tiempo</summary>
+        <p>Recorta en este orden: <strong>bloque 9</strong> → detalle de orquestación (<strong>7</strong>) → ejemplos de prompts en vivo (<strong>3 y 4</strong>). <strong>Nunca recortes el bloque 5</strong> (tests): es lo que te diferencia de YouTube.</p>
+      </details>
+    </section>
+
+    <footer class="pres__pie">
+      <button type="button" class="accion accion--secundaria" data-comando="anterior">← Anterior</button>
+      <p class="pres__estado" data-estado role="status">Esperando la presentación principal…</p>
+      <a class="accion accion--secundaria" href="/?modo=presentacion" target="taller-principal" data-abrir-principal>Abrir la presentación</a>
+      <button type="button" class="accion accion--principal" data-comando="siguiente">Siguiente →</button>
+    </footer>
+  </div>
+
+  <script type="application/json" id="pres-datos" set:html={JSON.stringify(datos)} />
+  <script>
+    import '../cliente/presentador';
+  </script>
+</Base>

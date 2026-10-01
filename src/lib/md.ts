@@ -48,6 +48,19 @@ export function renderizarMd(fuente: string, opciones: OpcionesMd = {}): Resulta
         if (paso) return `<li data-paso="${paso}" class="paso">${cuerpo}</li>\n`;
         return `<li>${cuerpo}</li>\n`;
       },
+      // Las casillas de las listas de tareas no son campos de formulario: son estado ilustrativo.
+      checkbox({ checked }: Tokens.Checkbox) {
+        return `<span class="casilla${checked ? ' casilla--hecha' : ''}" role="img" aria-label="${checked ? 'hecho' : 'pendiente'}"></span> `;
+      },
+      blockquote(this: any, token: Tokens.Blockquote) {
+        const cuerpo = this.parser.parse(token.tokens);
+        const paso = (token as any).paso as number | undefined;
+        return paso ? `<blockquote data-paso="${paso}" class="paso">
+${cuerpo}</blockquote>
+` : `<blockquote>
+${cuerpo}</blockquote>
+`;
+      },
       link({ href, title, tokens }: Tokens.Link) {
         const texto = (this as any).parser.parseInline(tokens);
         const externo = /^https?:\/\//.test(href);
@@ -59,9 +72,10 @@ export function renderizarMd(fuente: string, opciones: OpcionesMd = {}): Resulta
   const tokens = marked.lexer(fuente);
   let pasos = 0;
   if (opciones.pasosEnListas) {
-    // Solo los elementos de primer nivel de cada lista son pasos de revelado.
+    // Solo los elementos de primer nivel de cada lista y las citas de primer nivel son pasos de revelado.
     for (const t of tokens) {
       if (t.type === 'list') for (const item of (t as Tokens.List).items) (item as any).paso = ++pasos;
+      else if (t.type === 'blockquote') (t as any).paso = ++pasos;
     }
   }
   return { html: marked.parser(tokens), pasos };

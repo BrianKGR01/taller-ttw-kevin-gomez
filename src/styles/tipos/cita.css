@@ -1,1 +1,122 @@
-/* tipos/cita */
+/* ── Cita (escena, prompt mágico, PRD) y tarjeta de cita del post ───────────── */
+
+.cita {
+  display: grid;
+  gap: var(--proy-gap-grande);
+  max-inline-size: var(--ancho-cita);
+}
+.cita__cuerpo blockquote {
+  position: relative;
+  margin: 0;
+  padding-inline-start: var(--esp-6);
+  font-family: var(--fuente-display);
+  font-size: calc(var(--proy-titulo) * 0.72);
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta-fuerte);
+  text-wrap: balance;
+}
+.cita__cuerpo blockquote::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: var(--esp-2);
+  border-radius: var(--radio-chico);
+  background: var(--fase-actual);
+}
+.cita__cuerpo blockquote p {
+  margin: 0;
+}
+.cita__cuerpo > p,
+.cita__cuerpo > ul {
+  margin: var(--proy-gap) 0 0;
+  font-size: calc(var(--proy-cuerpo) * 0.95);
+  line-height: var(--interlinea-subtitulo);
+}
+.cita__cuerpo strong {
+  color: var(--tinta-fuerte);
+}
+
+/* Variante terminal: el prompt se teclea como si lo escribiera el agente. */
+.cita__terminal {
+  margin: 0;
+  padding: var(--proy-gap-grande) var(--proy-gap-grande);
+  border: var(--filete) solid var(--borde-fuerte);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie-hundida);
+  font-family: var(--fuente-mono);
+  font-size: var(--proy-subtitulo);
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta-fuerte);
+}
+.cita--terminal .cita__cuerpo p {
+  font-size: var(--proy-subtitulo);
+  color: var(--tinta-fuerte);
+  font-weight: 700;
+}
+
+/* Tarjeta de cita del post (sin imitar la interfaz de X). */
+.cita-x {
+  display: grid;
+  gap: var(--proy-gap-grande);
+}
+.cita-x__tarjeta {
+  position: relative;
+  margin: 0;
+  padding: var(--proy-gap-grande);
+  max-inline-size: var(--ancho-tarjeta-cita);
+  border: var(--filete) solid transparent;
+  border-radius: var(--radio-tarjeta);
+  background:
+    linear-gradient(var(--superficie-elevada), var(--superficie-elevada)) padding-box,
+    var(--gradiente-borde) border-box;
+}
+.cita-x__texto {
+  margin: 0;
+  font-size: calc(var(--proy-cuerpo) * 0.9);
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta-fuerte);
+}
+.cita-x__texto p {
+  margin: 0 0 var(--proy-gap);
+}
+.cita-x__texto p:first-child {
+  font-family: var(--fuente-display);
+  font-weight: 700;
+}
+.cita-x__texto p:last-child {
+  margin-block-end: 0;
+}
+.cita-x__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-4);
+  margin-block-start: var(--proy-gap);
+  padding-block-start: var(--proy-gap);
+  border-block-start: var(--filete) solid var(--borde);
+  font-size: var(--escala-nota);
+  color: var(--tinta-suave);
+}
+.cita-x__autor strong {
+  color: var(--tinta-fuerte);
+}
+.cita-x__cuenta {
+  font-family: var(--fuente-mono);
+}
+.cita-x__nota ul {
+  display: grid;
+  gap: var(--proy-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--proy-cuerpo);
+  line-height: var(--interlinea-subtitulo);
+}
+.cita-x__nota li {
+  padding-inline-start: var(--esp-5);
+  border-inline-start: calc(var(--filete) * 2) solid var(--fase-actual);
+}
+.cita-x__nota strong {
+  color: var(--tinta-fuerte);
+}

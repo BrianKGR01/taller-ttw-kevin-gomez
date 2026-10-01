@@ -1,4 +1,5 @@
 ---
+import Video from '../Video.astro';
 import type { ItemDiapo } from '../../lib/deck';
 
 interface Props {
@@ -8,11 +9,11 @@ interface Props {
 const { d } = Astro.props;
 ---
 
-<div class="texto">
+<Video nombre="agentes2" clase="ejecucion__video" />
+<div class="ejecucion">
   <header class="cabeza">
     {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
     <h3 class="titulo ent" style="--i:1">{d.titulo}</h3>
-    {d.subtitulo && <p class="subtitulo ent" style="--i:2">{d.subtitulo}</p>}
   </header>
-  <div class="texto__cuerpo ent" style="--i:3" set:html={d.html} />
+  <div class="lista__items ejecucion__items" set:html={d.html} />
 </div>

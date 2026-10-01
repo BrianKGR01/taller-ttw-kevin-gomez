@@ -1,18 +1,112 @@
 ---
+/**
+ * Estructura de carpetas recomendada, dibujada como un árbol real.
+ *
+ * La fuente es el mismo archivo que se descarga (contenido-descargas/
+ * estructura-de-carpetas.txt): un solo texto para el árbol, para «Copiar
+ * estructura» y para «Descargar». Aquí se analiza línea a línea (guías,
+ * nombre, comentario) y se dibuja con CSS y SVG que leen tokens.
+ *
+ * La relación «CLAUDE.md importa AGENTS.md» se deduce del comentario (el que
+ * nombra a otro archivo) y se resalta con el acento de la fase.
+ */
 import type { ItemDiapo } from '../../lib/deck';
+import CopiarBoton from '../CopiarBoton.astro';
+import Descarga from '../Descarga.astro';
+import crudo from '../../../contenido-descargas/estructura-de-carpetas.txt?raw';
 
 interface Props {
   d: ItemDiapo;
   etiquetaBloque: string;
 }
 const { d } = Astro.props;
+
+const texto = crudo.replace(/\r\n/g, '\n').replace(/\n+$/, '');
+
+interface Linea {
+  nombre: string;
+  carpeta: boolean;
+  nivel: number;
+  guias: ('vert' | 'vacia')[];
+  rama: 'medio' | 'ultimo' | null;
+  nota: string;
+  par: 'origen' | 'destino' | null;
+  salto: number;
+}
+
+// Cada nivel del dibujo ASCII ocupa 4 caracteres: «│   » o «    »; la última rama es «├── » o «└── ».
+const RE_LINEA = /^((?:│ {3}| {4})*)(├── |└── )?(.*?)(?:\s+#\s*(.*?))?\s*$/;
+const lineas: Linea[] = texto.split('\n').map((l) => {
+  const m = RE_LINEA.exec(l)!;
+  const guias = [...(m[1] ?? '').matchAll(/│ {3}| {4}/g)].map((g) => (g[0].startsWith('│') ? ('vert' as const) : ('vacia' as const)));
+  const rama = m[2] ? (m[2].startsWith('├') ? ('medio' as const) : ('ultimo' as const)) : null;
+  const nombre = m[3] ?? '';
+  return {
+    nombre,
+    carpeta: nombre.endsWith('/'),
+    nivel: guias.length + (rama ? 1 : 0),
+    guias,
+    rama,
+    nota: m[4] ?? '',
+    par: null,
+    salto: 0,
+  };
+});
+// Un comentario que nombra a otro archivo del árbol marca una relación (CLAUDE.md → AGENTS.md).
+lineas.forEach((l, i) => {
+  if (!l.nota || l.carpeta) return;
+  const destino = lineas.findIndex((x, j) => j !== i && !x.carpeta && l.nota.includes(x.nombre));
+  if (destino < 0) return;
+  l.par = 'origen';
+  lineas[destino]!.par = 'destino';
+  lineas[destino]!.salto = Math.abs(i - destino);
+});
 ---
 
-<div class="texto">
-  <header class="cabeza">
-    {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
+<div class="carpetas">
+  <div class="carpetas__cab">
     <h3 class="titulo ent" style="--i:1">{d.titulo}</h3>
     {d.subtitulo && <p class="subtitulo ent" style="--i:2">{d.subtitulo}</p>}
-  </header>
-  <div class="texto__cuerpo ent" style="--i:3" set:html={d.html} />
+    <div class="carpetas__acciones ent" style="--i:3">
+      <CopiarBoton valor={texto} etiqueta="Copiar estructura" nombre="la estructura de carpetas" />
+      <Descarga archivo="estructura-de-carpetas.txt" etiqueta="Descargar" variante="principal" />
+    </div>
+  </div>
+
+  <figure class="arbol" aria-label="Estructura de carpetas recomendada de un proyecto" style={`--total:${lineas.length}`}>
+    <ul class="arbol__lista">
+      {lineas.map((l, i) => (
+        <li
+          class="arbol__fila ent"
+          aria-level={l.nivel + 1}
+          data-tipo={l.carpeta ? 'carpeta' : 'archivo'}
+          data-par={l.par ?? undefined}
+          style={`--i:${i + 2}${l.salto ? `; --salto:${l.salto}` : ''}`}
+        >
+          <span class="arbol__guias" aria-hidden="true">
+            {l.guias.map((g) => <span class={`guia guia--${g}`} />)}
+            {l.rama && <span class={`guia guia--${l.rama}`} />}
+          </span>
+          <svg class="arbol__icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            {l.carpeta ? (
+              <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.2h7.5A2.5 2.5 0 0 1 21 9.7v7.8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5v-10Z" />
+            ) : (
+              <path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM14 3v4h4M9 12h6M9 16h6" />
+            )}
+          </svg>
+          <span class="arbol__nombre">
+            <span class="solo-lectura">{l.carpeta ? 'carpeta ' : 'archivo '}</span>{l.nombre}
+          </span>
+          {l.nota && (
+            <span class="arbol__nota">
+              {l.par === 'origen' && (
+                <svg class="arbol__sube" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V5M6 11l6-6 6 6" /></svg>
+              )}
+              <span class="solo-lectura">comentario: </span>{l.nota}
+            </span>
+          )}
+        </li>
+      ))}
+    </ul>
+  </figure>
 </div>

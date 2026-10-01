@@ -1,1 +1,228 @@
-/* tipos/tarjetas */
+/* tipos/tarjetas — tarjeta de vista previa de enlace + diapositiva de tarjetas */
+
+/* ── La tarjeta (TarjetaEnlace.astro) ───────────────────────────────────────
+ * Es un enlace: la flecha lo marca. Hover = borde y resplandor, nunca tamaño.
+ * La proporción de la imagen (1200×630) se reserva siempre: cero saltos. */
+.tarjeta {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-inline-size: 0;
+  overflow: hidden;
+  border: var(--filete) solid var(--borde-fuerte);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie-elevada);
+  color: var(--tinta);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color var(--mov-rapido) var(--curva-estandar),
+    box-shadow var(--mov-rapido) var(--curva-estandar);
+  -webkit-tap-highlight-color: transparent;
+}
+.tarjeta:hover {
+  border-color: var(--fase-actual);
+  box-shadow:
+    0 0 0 var(--filete) var(--fase-suave),
+    var(--resplandor);
+  color: var(--tinta);
+}
+
+.tarjeta__medio {
+  position: relative;
+  aspect-ratio: 1200 / 630;
+  overflow: hidden;
+  border-block-end: var(--filete) solid var(--borde);
+  background: var(--superficie-hundida);
+}
+.tarjeta__medio img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* Respaldo: nombre y enlace, con el filete de espectro como única decoración. */
+.tarjeta__marcador {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+  text-align: center;
+}
+.tarjeta__marcador::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: calc(var(--filete) * 2);
+  background: var(--gradiente-borde);
+}
+.tarjeta__marcador svg {
+  inline-size: var(--icono-grande);
+  block-size: var(--icono-grande);
+  fill: none;
+  stroke: var(--fase-actual);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tarjeta__nombre {
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  font-size: max(var(--escala-cuerpo-lg), calc(var(--proy-cuerpo) * 0.95));
+  line-height: var(--interlinea-subtitulo);
+  letter-spacing: -0.01em;
+  color: var(--tinta-fuerte);
+  text-wrap: balance;
+}
+
+.tarjeta__cuerpo {
+  display: grid;
+  align-content: start;
+  gap: var(--esp-2);
+  padding: var(--esp-4);
+  min-inline-size: 0;
+}
+.tarjeta__cuerpo p {
+  margin: 0;
+}
+.tarjeta__dominio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  font-family: var(--fuente-mono);
+  font-size: max(var(--escala-nota), var(--proy-etiqueta));
+  letter-spacing: 0.02em;
+  color: var(--tinta-suave);
+}
+.tarjeta__dominio > span:first-child {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tarjeta__flecha {
+  flex: none;
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  font-size: max(var(--escala-cuerpo-lg), calc(var(--proy-cuerpo) * 0.9));
+  line-height: 1;
+  color: var(--fase-actual);
+}
+.tarjeta__titulo {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  font-size: max(var(--escala-cuerpo-lg), calc(var(--proy-cuerpo) * 0.78));
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta-fuerte);
+  text-wrap: balance;
+}
+.tarjeta__desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: max(var(--escala-cuerpo), calc(var(--proy-cuerpo) * 0.62));
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta);
+}
+/* Leyendo en pantalla chica o en modo lectura, la descripción va completa. */
+html[data-uso='lectura'] .tarjeta__titulo,
+html[data-uso='lectura'] .tarjeta__desc {
+  display: block;
+  overflow: visible;
+}
+
+/* Miniatura a la izquierda: dos tarjetas apiladas caben en media diapositiva. */
+.tarjeta--horizontal {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: none;
+}
+.tarjeta--horizontal .tarjeta__medio {
+  aspect-ratio: auto;
+  border-block-end: 0;
+  border-inline-end: var(--filete) solid var(--borde);
+}
+
+/* ── La diapositiva (Tarjetas.astro) ─────────────────────────────────────── */
+.tarjetas {
+  display: grid;
+  gap: var(--proy-gap-grande);
+}
+.tarjetas__cabeza {
+  margin: 0;
+}
+.tarjetas__enlaces {
+  display: grid;
+  gap: var(--proy-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tarjetas__item {
+  display: grid;
+  min-inline-size: 0;
+}
+.tarjetas__item > .tarjeta {
+  min-block-size: 0;
+}
+
+@media (min-width: 821px) {
+  html[data-uso='presentacion'] .tarjetas--con-texto {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-areas:
+      'cabeza cabeza'
+      'texto enlaces';
+    column-gap: var(--proy-gap-grande);
+    align-items: start;
+  }
+  html[data-uso='presentacion'] .tarjetas--con-texto .tarjetas__cabeza {
+    grid-area: cabeza;
+  }
+  html[data-uso='presentacion'] .tarjetas--con-texto .tarjetas__texto {
+    grid-area: texto;
+  }
+  html[data-uso='presentacion'] .tarjetas--con-texto .tarjetas__enlaces {
+    grid-area: enlaces;
+  }
+  html[data-uso='presentacion'] .tarjetas--solas .tarjetas__enlaces {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--proy-gap-grande);
+  }
+}
+
+/* Lectura y pantallas chicas: tarjetas completas, en rejilla fluida. */
+html[data-uso='lectura'] .tarjetas__enlaces {
+  grid-template-columns: var(--rejilla-tarjetas);
+  gap: var(--proy-gap-grande);
+}
+@media (max-width: 820px) {
+  .tarjeta--horizontal {
+    grid-template-columns: none;
+    grid-template-rows: auto 1fr;
+  }
+  .tarjeta--horizontal .tarjeta__medio {
+    aspect-ratio: 1200 / 630;
+    border-block-end: var(--filete) solid var(--borde);
+    border-inline-end: 0;
+  }
+}
+html[data-uso='lectura'] .tarjeta--horizontal {
+  grid-template-columns: none;
+  grid-template-rows: auto 1fr;
+}
+html[data-uso='lectura'] .tarjeta--horizontal .tarjeta__medio {
+  aspect-ratio: 1200 / 630;
+  border-block-end: var(--filete) solid var(--borde);
+  border-inline-end: 0;
+}

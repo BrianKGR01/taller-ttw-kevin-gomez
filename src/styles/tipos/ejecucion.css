@@ -1,1 +1,15 @@
-/* tipos/ejecucion */
+/* ── Ejecución (7.1): los agentes trabajando, con el video de código en cascada ─ */
+
+.ejecucion {
+  display: grid;
+  gap: var(--proy-gap);
+  max-inline-size: 58%;
+}
+.diap--ejecucion .video-fondo {
+  inset: 0;
+  inset-inline-start: 46%;
+  inline-size: 54%;
+  opacity: calc(var(--video-opacidad) * 0.8);
+  -webkit-mask-image: var(--m-lateral);
+  mask-image: var(--m-lateral);
+}

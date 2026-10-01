@@ -169,6 +169,10 @@ html[data-uso='lectura'] .diap--apertura {
   }
   .fases__item[aria-current='step'] .fases__texto {
     display: inline;
+    max-inline-size: var(--fases-texto-max);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .barra__nombre {
     display: none;

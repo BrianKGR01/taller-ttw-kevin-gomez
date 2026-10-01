@@ -1,1 +1,274 @@
-/* tipos/cierre */
+/* tipos/cierre — "Llévatelo": QR, contacto y comunidad sobre la foto del expositor */
+
+.diap--cierre {
+  overflow-x: clip;
+}
+html[data-uso='lectura'] .diap--cierre {
+  overflow: hidden;
+}
+
+.cierre {
+  display: grid;
+  gap: var(--proy-gap-grande);
+}
+.cierre__cabeza {
+  margin: 0;
+}
+
+/* ── Foto de apoyo ──────────────────────────────────────────────────────────
+ * Nunca compite con el texto: gris, difuminada hacia los bordes con la máscara
+ * de halo del sistema y cubierta por un velo de la propia superficie (así el
+ * tratamiento se ajusta solo a cada tema: en oscuro la hunde en el negro, en
+ * claro la aclara hacia el blanco). Estática: sin movimiento que apagar. */
+.cierre__foto {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: -1;
+  inline-size: 64%;
+  pointer-events: none;
+  -webkit-mask-image: var(--m-halo);
+  mask-image: var(--m-halo);
+}
+.cierre__foto img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  filter: grayscale(1);
+}
+.cierre__foto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--superficie) 86%, transparent);
+}
+/* En claro, sobre blanco, el velo es un poco más espeso: la foto se lee igual y el texto gris sigue en AA. */
+html[data-modo='claro'] .cierre__foto::after {
+  background: color-mix(in srgb, var(--superficie) 90%, transparent);
+}
+@media (prefers-color-scheme: light) {
+  html:not([data-modo='oscuro']) .cierre__foto::after {
+    background: color-mix(in srgb, var(--superficie) 90%, transparent);
+  }
+}
+html[data-uso='lectura'] .cierre__foto {
+  inline-size: 100%;
+}
+html[data-uso='lectura'] .cierre__foto::after {
+  background: color-mix(in srgb, var(--superficie) 90%, transparent);
+}
+
+/* ── QR ─────────────────────────────────────────────────────────────────────
+ * Siempre módulos oscuros sobre placa clara, en los dos temas: es la polaridad
+ * que todos los lectores resuelven (el QR invertido falla en lectores viejos y
+ * en varias apps). `light-dark()` elige entre los MISMOS dos tokens de texto y
+ * superficie, así que sigue la identidad de la casa sin literales. */
+.cierre__qr {
+  --qr-modulo: light-dark(var(--tinta-fuerte), var(--superficie));
+  --qr-placa: light-dark(var(--superficie), var(--tinta-fuerte));
+  display: grid;
+  justify-items: start;
+  gap: var(--esp-2);
+  min-inline-size: 0;
+}
+.qr-placa {
+  inline-size: var(--lado-qr);
+  max-inline-size: 100%;
+  overflow: hidden;
+  border: var(--filete) solid var(--borde-fuerte);
+  border-radius: var(--radio-tarjeta);
+  background: var(--qr-placa);
+}
+html[data-uso='presentacion'] .qr-placa {
+  inline-size: var(--lado-qr-proy);
+}
+.qr {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 1;
+}
+.qr__fondo {
+  fill: var(--qr-placa);
+}
+.qr__modulos {
+  fill: var(--qr-modulo);
+}
+.qr__url {
+  justify-content: flex-start;
+  padding-inline: 0;
+  font-family: var(--fuente-mono);
+  font-size: max(var(--escala-nota), calc(var(--proy-cuerpo) * 0.6));
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+.qr__url span:first-child {
+  min-inline-size: 0;
+}
+.qr__url span:last-child {
+  font-family: var(--fuente-display);
+  font-weight: 700;
+}
+/* Copiar el enlace sirve a quien lee en su pantalla; en la sala sobra. */
+html[data-uso='presentacion'] .cierre__qr [data-copiar] {
+  display: none;
+}
+
+/* ── Texto, contacto y comunidad ─────────────────────────────────────────── */
+.cierre__info {
+  display: grid;
+  align-content: start;
+  gap: var(--proy-gap-grande);
+  min-inline-size: 0;
+}
+.cierre__leyenda {
+  font-size: var(--proy-subtitulo);
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta);
+  max-inline-size: var(--proy-ancho-texto);
+}
+.cierre__leyenda p {
+  margin: 0;
+  text-wrap: balance;
+}
+.cierre__leyenda strong {
+  color: var(--tinta-fuerte);
+}
+
+.cierre__contacto {
+  display: grid;
+  gap: var(--proy-gap);
+}
+.cierre__rotulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--esp-2) var(--esp-4);
+  margin: 0;
+  font-family: var(--fuente-mono);
+  font-size: var(--proy-etiqueta);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+.cierre__nombre {
+  font-family: var(--fuente-texto);
+  font-size: calc(var(--proy-cuerpo) * 0.78);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--tinta-fuerte);
+}
+.contacto {
+  display: grid;
+  justify-items: stretch;
+  max-inline-size: var(--ancho-contacto);
+  gap: var(--esp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.contacto__accion,
+.contacto__falta {
+  gap: var(--esp-3);
+  min-block-size: calc(var(--area-tactil) * 1.25);
+  padding-inline: var(--esp-5);
+  font-size: max(var(--escala-cuerpo), calc(var(--proy-cuerpo) * 0.7));
+  line-height: 1.1;
+}
+.contacto__accion svg,
+.contacto__falta svg {
+  inline-size: var(--icono-grande);
+  block-size: var(--icono-grande);
+}
+.contacto__accion,
+.contacto__falta {
+  justify-content: flex-start;
+}
+.contacto__texto {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--esp-3);
+  min-inline-size: 0;
+}
+.contacto__red {
+  font-weight: 700;
+}
+.contacto__valor {
+  margin-inline-start: auto;
+  overflow-wrap: anywhere;
+  font-family: var(--fuente-mono);
+  font-size: 0.85em;
+  color: var(--tinta);
+}
+
+/* Dato que falta: un espacio marcado, discreto, que no se puede tocar. */
+.contacto__falta {
+  display: inline-flex;
+  align-items: center;
+  border: var(--filete) dashed var(--borde-fuerte);
+  border-radius: var(--radio-chico);
+  color: var(--tinta-suave);
+}
+.contacto__falta svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.contacto__falta .contacto__valor {
+  color: var(--tinta-suave);
+  font-style: italic;
+}
+
+.cierre__comunidad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--proy-gap) var(--proy-gap-grande);
+}
+.cierre__comunidad-texto {
+  margin: 0;
+  font-size: calc(var(--proy-cuerpo) * 0.78);
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta);
+}
+.cierre__comunidad-texto strong {
+  color: var(--tinta-fuerte);
+}
+
+/* ── Disposición ancha (proyección y lectura en escritorio): título arriba; QR a la izquierda, resto a la derecha. */
+@media (min-width: 821px) {
+  .cierre {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'cabeza cabeza'
+      'qr info';
+    column-gap: var(--proy-margen-x);
+    align-items: start;
+  }
+  .cierre__cabeza {
+    grid-area: cabeza;
+  }
+  .cierre__qr {
+    grid-area: qr;
+  }
+  .cierre__info {
+    grid-area: info;
+  }
+}
+
+/* Pantallas chicas y lectura: nombre de la red encima, dato debajo (cabe en 360 px). */
+@media (max-width: 820px) {
+  .contacto__texto {
+    flex-direction: column;
+    gap: var(--esp-1);
+  }
+  .contacto__valor {
+    margin-inline-start: 0;
+  }
+}

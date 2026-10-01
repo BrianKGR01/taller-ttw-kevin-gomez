@@ -50,7 +50,7 @@ test.describe('navegación por teclado', () => {
     await expect(vistos).toHaveCount(5);
     await esperarDiapo(page, '3.2');
     await page.keyboard.press('Space');
-    await esperarDiapo(page, '3.6');
+    await esperarDiapo(page, '3.3');
     // Al volver hacia atrás, la diapositiva con pasos llega completa.
     await page.keyboard.press('PageUp');
     await esperarDiapo(page, '3.2');
@@ -63,13 +63,18 @@ test.describe('navegación por teclado', () => {
     await page.mouse.move(600, 400);
     await page.mouse.wheel(0, 120);
     await esperarDiapo(page, '0.2');
-    // Una ráfaga de inercia inmediata no debe saltar otra diapositiva.
-    for (let i = 0; i < 6; i++) await page.mouse.wheel(0, 30);
-    await page.waitForTimeout(300);
-    await esperarDiapo(page, '0.2');
-    await page.waitForTimeout(600);
+    // Pasada de trackpad con inercia: un gesto fuerte y una cola de eventos de pocos ms entre sí.
+    // Debe avanzar UNA diapositiva (0.2 → 1.1), no dos.
+    await page.waitForTimeout(700);
+    await page.evaluate(() => {
+      for (const dy of [120, 30, 30, 30, 30, 30, 30]) document.dispatchEvent(new WheelEvent('wheel', { deltaY: dy, bubbles: true, cancelable: true }));
+    });
+    await esperarDiapo(page, '1.1');
+    await page.waitForTimeout(500);
+    await esperarDiapo(page, '1.1');
+    await page.waitForTimeout(700);
     await page.mouse.wheel(0, -120);
-    await esperarDiapo(page, '0.1');
+    await esperarDiapo(page, '0.2');
   });
 });
 
@@ -81,8 +86,8 @@ test.describe('URL por diapositiva', () => {
     await page.reload();
     await esperarDiapo(page, '3.6');
     await page.keyboard.press('ArrowUp');
-    await esperarDiapo(page, '3.2');
-    expect(page.url()).toMatch(/#\/3\/2$/);
+    await esperarDiapo(page, '3.5');
+    expect(page.url()).toMatch(/#\/3\/5$/);
   });
 
   test('un hash inválido abre la portada', async ({ page }) => {

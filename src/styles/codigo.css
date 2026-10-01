@@ -11,7 +11,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--esp-4);
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-4);
   padding: var(--esp-2) var(--esp-2) var(--esp-2) var(--esp-4);
   border-block-end: var(--filete) solid var(--borde);
   font-family: var(--fuente-mono);
@@ -21,6 +22,8 @@
   color: var(--tinta-suave);
 }
 .codigo__titulo {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
   display: inline-flex;
   align-items: center;
   gap: var(--esp-3);
@@ -44,7 +47,7 @@
   overflow: auto;
   font-family: var(--fuente-mono);
   font-size: var(--proy-codigo);
-  line-height: 1.6;
+  line-height: 1.5;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   color: var(--tinta);

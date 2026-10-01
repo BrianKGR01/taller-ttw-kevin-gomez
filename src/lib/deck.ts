@@ -80,6 +80,10 @@ export async function cargarBloques(): Promise<ItemBloque[]> {
       if (d.data.tipo === 'tabla') item.tabla = tablaDeMd(pres);
       // El recorrido de un documento tiene un paso por sección y uno final que vuelve a la vista completa.
       if (d.data.tipo === 'documento') item.pasos = ((d.data.datos?.secciones as unknown[] | undefined)?.length ?? 0) + 1;
+      // El roadmap por hitos revela un hito por avance, y el ciclo del final como un paso más.
+      if (d.data.tipo === 'hitos' && Array.isArray(d.data.datos?.hitos)) {
+        item.pasos = d.data.datos.hitos.length + (Array.isArray(d.data.datos.ciclo) && d.data.datos.ciclo.length ? 1 : 0);
+      }
       return item;
     });
 

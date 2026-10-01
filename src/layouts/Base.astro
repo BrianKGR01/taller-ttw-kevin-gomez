@@ -24,6 +24,7 @@ const urlImagen = new URL(imagen, canonica).href;
     <title>{titulo}</title>
     <meta name="description" content={descripcion} />
     <link rel="canonical" href={canonica} />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
@@ -41,16 +42,19 @@ const urlImagen = new URL(imagen, canonica).href;
     <meta property="og:image" content={urlImagen} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:alt" content="Portada de la presentación: IA aplicada al desarrollo de software, el proceso de desarrollo en la era agéntica" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={titulo} />
     <meta name="twitter:description" content={descripcion} />
     <meta name="twitter:image" content={urlImagen} />
+    <meta name="twitter:image:alt" content="Portada de la presentación: IA aplicada al desarrollo de software, el proceso de desarrollo en la era agéntica" />
 
     <link rel="preload" href={regular} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={negrita} as="font" type="font/woff2" crossorigin />
 
     <!-- Restaura tema y modo antes del primer pintado. -->
+    <slot name="head" />
     <script is:inline set:html={restaurar}></script>
   </head>
   <body class={bodyClass}>

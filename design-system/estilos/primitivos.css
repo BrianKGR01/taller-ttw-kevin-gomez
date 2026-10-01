@@ -183,4 +183,7 @@
    * literal (el negro opaco), aunque solo se use su opacidad.
    */
   --m-halo: radial-gradient(ellipse at 70% 50%, var(--gdg-negro) 20%, transparent 85%);
+
+  /* Mascara lateral (solo alfa): el video de ejecucion queda a la derecha y se desvanece hacia el texto. */
+  --m-lateral: linear-gradient(to left, var(--gdg-negro) 0%, var(--gdg-negro) 45%, transparent 100%);
 }

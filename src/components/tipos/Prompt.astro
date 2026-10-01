@@ -1,21 +1,30 @@
 ---
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import CopiarBoton from '../CopiarBoton.astro';
+import Descarga from '../Descarga.astro';
 import type { ItemDiapo } from '../../lib/deck';
-import { FASES } from '../../lib/fases';
 
 interface Props {
   d: ItemDiapo;
   etiquetaBloque: string;
 }
-const { d, etiquetaBloque } = Astro.props;
-const fase = d.fase ? FASES[d.fase - 1] : undefined;
-const Titulo = d.tipo === 'portada' ? 'h1' : 'h3';
-void etiquetaBloque; void fase; void Titulo;
+const { d } = Astro.props;
+// `datos.copiar` / `datos.descarga`: archivo completo para copiar o bajar (por ejemplo la plantilla AGENTS.md).
+const textoCompleto: string | undefined = d.datos.copiar ? readFileSync(join(process.cwd(), d.datos.copiar), 'utf8') : undefined;
 ---
 
 <div class="prompt">
   <header class="cabeza">
     {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
-    <Titulo class="titulo ent" style="--i:1">{d.titulo}</Titulo>
+    <h3 class="titulo ent" style="--i:1">{d.titulo}</h3>
+    {d.subtitulo && <p class="subtitulo ent" style="--i:2">{d.subtitulo}</p>}
   </header>
-  <div class="prompt__codigo ent" style="--i:2" set:html={d.html} />
+  <div class="prompt__codigo ent" style="--i:3" set:html={d.html} />
+  {(textoCompleto || d.datos.descarga) && (
+    <div class="prompt__acciones ent" style="--i:4">
+      {textoCompleto && <CopiarBoton valor={textoCompleto} etiqueta="Copiar la plantilla completa" nombre="la plantilla completa" />}
+      {d.datos.descarga && <Descarga archivo={d.datos.descarga} etiqueta={`Descargar ${d.datos.descarga}`} />}
+    </div>
+  )}
 </div>

@@ -1,4 +1,15 @@
 ---
+/**
+ * «CI/CD: cada versión, al celular».
+ *
+ * A la izquierda, la lista (pasos) y el pipeline Hito terminado → Tests →
+ * Despliegue → Notificación, que se dibuja etapa por etapa al activarse la
+ * diapositiva. A la derecha, la ilustración de un celular que recibe la
+ * notificación (en el paso 2, cuando se dice «notificación al celular»).
+ *
+ * Es una ilustración: sin logos ni marcas de terceros, dominio ficticio
+ * (.example). Todo el texto sale del frontmatter (`datos`).
+ */
 import type { ItemDiapo } from '../../lib/deck';
 
 interface Props {
@@ -6,13 +17,83 @@ interface Props {
   etiquetaBloque: string;
 }
 const { d } = Astro.props;
+
+interface Notificacion {
+  app?: string;
+  cuando?: string;
+  hora?: string;
+  titulo?: string;
+  campos?: { etiqueta: string; valor: string }[];
+}
+const datos = d.datos as { etapas?: string[]; notificacion?: Notificacion };
+const etapas = datos.etapas ?? [];
+const n = datos.notificacion ?? {};
+const campos = n.campos ?? [];
+
+// Un icono por etapa, trazado a mano (24×24, solo trazos).
+const ICONOS: string[] = [
+  'M6 21V4M6 5h11l-2.5 3.5L17 12H6', // bandera: hito terminado
+  'M12 3l7 3v5.5c0 4.7-3 8-7 9.5-4-1.5-7-4.8-7-9.5V6l7-3ZM8.8 12l2.3 2.3 4.2-4.6', // escudo con check: tests
+  'M7.5 18.5a4.5 4.5 0 0 1-.7-8.9 6 6 0 0 1 11.5 1.6 3.9 3.9 0 0 1-.6 7.3ZM12 16.5v-6M9.2 13l2.8-2.8 2.8 2.8', // nube con flecha: despliegue
+  'M12 4a5.5 5.5 0 0 0-5.5 5.5c0 5-2 6.5-2 6.5h15s-2-1.5-2-6.5A5.5 5.5 0 0 0 12 4ZM10 19.5a2 2 0 0 0 4 0', // campana: notificación
+];
+const descripcionCelular = `Ilustración: un celular recibe la notificación «${n.titulo}». ${campos.map((c) => `${c.etiqueta}: ${c.valor}`).join('. ')}.`;
 ---
 
-<div class="texto">
+<div class="ci">
   <header class="cabeza">
-    {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
     <h3 class="titulo ent" style="--i:1">{d.titulo}</h3>
-    {d.subtitulo && <p class="subtitulo ent" style="--i:2">{d.subtitulo}</p>}
   </header>
-  <div class="texto__cuerpo ent" style="--i:3" set:html={d.html} />
+
+  <div class="ci__cuerpo">
+    <div class="ci__izq">
+      <div class="ci__texto lista__items ent" style="--i:2" set:html={d.html} />
+
+      <ol class="pipeline" aria-label="Flujo de CI/CD">
+        {etapas.map((etapa, i) => (
+          <li class="pipeline__etapa" data-final={i === etapas.length - 1 ? '' : undefined} style={`--i:${i}`}>
+            <span class="pipeline__nodo" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d={ICONOS[i] ?? ICONOS[0]} /></svg>
+            </span>
+            <span class="pipeline__nombre">{etapa}</span>
+            {i < etapas.length - 1 && <span class="pipeline__union" aria-hidden="true" />}
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <figure class="celular" aria-label={descripcionCelular}>
+      <div class="celular__marco" aria-hidden="true">
+        <span class="celular__isla" />
+        <div class="celular__pantalla">
+          <div class="celular__estado">
+            <span>{n.hora}</span>
+            <span class="celular__senal">
+              <i /><i /><i /><i />
+              <b />
+            </span>
+          </div>
+
+          <div class="notif" data-paso="2">
+            <div class="notif__cab">
+              <span class="notif__icono">
+                <svg viewBox="0 0 24 24" focusable="false"><path d={ICONOS[3]} /></svg>
+              </span>
+              <span class="notif__app">{n.app}</span>
+              <span class="notif__cuando">{n.cuando}</span>
+            </div>
+            <p class="notif__titulo">{n.titulo}</p>
+            <dl class="notif__campos">
+              {campos.map((c) => (
+                <div class="notif__campo">
+                  <dt>{c.etiqueta}</dt>
+                  <dd>{c.valor}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </div>
+    </figure>
+  </div>
 </div>

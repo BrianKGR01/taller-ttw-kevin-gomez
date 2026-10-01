@@ -28,6 +28,8 @@ import { iniciarCopiar } from './copiar';
 import { iniciarVideos } from './video';
 import { anunciar } from './anuncio';
 import { iniciarTour } from './tour';
+import { iniciarSincronizacion, type Sincronizacion } from './sincronizacion';
+import type { Accion } from '../lib/sincronizacion';
 
 const raiz = document.documentElement;
 const deck: Deck = JSON.parse(document.getElementById('deck-meta')!.textContent!);
@@ -44,7 +46,10 @@ let uso: ModoUso = raiz.dataset.uso === 'lectura' ? 'lectura' : 'presentacion';
 const $ = <T extends HTMLElement = HTMLElement>(s: string) => document.querySelector<T>(s);
 const $$ = <T extends HTMLElement = HTMLElement>(s: string, ctx: ParentNode = document) => [...ctx.querySelectorAll<T>(s)];
 
-const fondo = iniciarFondo($<HTMLCanvasElement>('[data-red]')!);
+const embebido = raiz.hasAttribute('data-embebido');
+// Las miniaturas de la vista de presentador no necesitan fondo vivo.
+const fondo = embebido ? { refrescarColores() {} } : iniciarFondo($<HTMLCanvasElement>('[data-red]')!);
+let sync: Sincronizacion | undefined;
 
 /* ───────────────────────── Pie, fases y anuncios ───────────────────────── */
 
@@ -73,6 +78,7 @@ function actualizarMarco() {
   if (barra && uso === 'presentacion') barra.style.transform = `scaleX(${pct / 100})`;
   $('.progreso')?.setAttribute('aria-valuenow', String(Math.round(pct)));
   fondo.refrescarColores();
+  sync?.publicar();
 }
 
 /* ───────────────────────── Pasos de revelado ───────────────────────── */
@@ -331,7 +337,7 @@ const ACCIONES: Record<string, (origen: HTMLElement) => void> = {
   ayuda: () => abrir(ayuda),
   anterior: ant,
   siguiente: sig,
-  presentador: () => document.dispatchEvent(new CustomEvent('taller:presentador')),
+  presentador: () => sync?.abrirPresentador(),
 };
 
 document.addEventListener('click', (e) => {
@@ -383,7 +389,7 @@ document.addEventListener('keydown', (e) => {
     case 's':
     case 'S':
       e.preventDefault();
-      return document.dispatchEvent(new CustomEvent('taller:presentador'));
+      return sync?.abrirPresentador();
   }
 
   // La navegación por diapositivas solo existe en modo presentación.
@@ -520,6 +526,29 @@ actualizarHash();
 iniciarCopiar();
 iniciarVideos();
 iniciarTour();
+
+const ACCIONES_REMOTAS: Record<Accion, () => void> = {
+  siguiente: sig,
+  anterior: ant,
+  'bloque-siguiente': () => ir(bloqueSiguiente(deck, estado)),
+  'bloque-anterior': () => ir(bloqueAnterior(deck, estado)),
+  abajo: () => ir(abajoEnBloque(deck, estado)),
+  arriba: () => ir(arribaEnBloque(deck, estado)),
+  inicio: () => ir(primera(deck)),
+  fin: () => ir(ultima(deck)),
+};
+sync = iniciarSincronizacion(
+  {
+    estado: () => estado,
+    id: () => elDe(estado)?.dataset.id ?? '',
+    accion: (a) => {
+      if (uso === 'presentacion') ACCIONES_REMOTAS[a]();
+    },
+    ir: (s) => ir(s, { sinHash: true }),
+  },
+  embebido,
+);
+sync.publicar();
 despertar();
 $('#principal')?.setAttribute('data-listo', '');
 raiz.dataset.listo = '';

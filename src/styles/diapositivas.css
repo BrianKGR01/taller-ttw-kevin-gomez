@@ -121,7 +121,7 @@ html[data-uso='presentacion'] .diap [data-paso][data-visto] {
   border-inline-start: var(--esp-1) solid var(--realce);
   border-radius: var(--radio-chico);
   background: var(--realce-suave);
-  font-size: calc(var(--proy-cuerpo) * 0.82);
+  font-size: calc(var(--proy-cuerpo) * 0.88);
   line-height: var(--interlinea-subtitulo);
   color: var(--tinta);
 }

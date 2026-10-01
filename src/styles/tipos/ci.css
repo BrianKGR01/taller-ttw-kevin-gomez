@@ -1,1 +1,396 @@
-/* tipos/ci */
+/* ── tipos/ci — CI/CD: pipeline animado + celular que recibe la notificación ──
+ * El pipeline se dibuja etapa por etapa al activarse la diapositiva (momento
+ * fuerte). El celular es una ilustración hecha en CSS: todo se mide en `em`
+ * del propio celular (`font-size` sale de su ancho), así que conserva las
+ * proporciones a cualquier tamaño. La notificación llega en el paso 2.
+ */
+
+.ci {
+  display: grid;
+}
+.ci__cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--proy-gap-grande) calc(var(--proy-gap-grande) * 1.5);
+  align-items: start;
+}
+.ci__izq {
+  display: grid;
+  align-content: start;
+  gap: var(--proy-gap-grande);
+  min-inline-size: 0;
+}
+
+/* ── Pipeline ─────────────────────────────────────────────────────────────── */
+
+.pipeline {
+  --nodo: calc(var(--proy-cuerpo) * 3);
+  --hueco: calc(var(--proy-cuerpo) * 1.1);
+  --linea: calc(var(--filete) * 1.5);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--hueco);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pipeline__etapa {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--esp-3);
+  text-align: center;
+}
+.pipeline__nodo {
+  display: grid;
+  place-items: center;
+  inline-size: var(--nodo);
+  block-size: var(--nodo);
+  border: var(--linea) solid var(--fase-actual);
+  border-radius: 50%;
+  background: var(--superficie);
+  color: var(--tinta-fuerte);
+}
+.pipeline__nodo svg {
+  inline-size: 52%;
+  block-size: 52%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pipeline__etapa[data-final] .pipeline__nodo {
+  background: var(--fase-actual);
+  color: var(--realce-tinta);
+}
+.pipeline__nombre {
+  font-size: calc(var(--proy-cuerpo) * 0.85);
+  font-weight: 700;
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta-fuerte);
+  text-wrap: balance;
+}
+
+/* Conexión entre etapas: filete + punta de flecha. */
+.pipeline__union {
+  position: absolute;
+  inset-block-start: calc(var(--nodo) / 2 - var(--linea) / 2);
+  inset-inline-start: calc(50% + var(--nodo) / 2 + var(--esp-2));
+  inline-size: calc(100% + var(--hueco) - var(--nodo) - var(--esp-2) * 2);
+  block-size: var(--linea);
+  border-radius: var(--linea);
+  background: var(--fase-actual);
+  transform-origin: left center;
+}
+.pipeline__union::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 0;
+  inline-size: calc(var(--proy-cuerpo) * 0.42);
+  block-size: calc(var(--proy-cuerpo) * 0.42);
+  border-block-start: var(--linea) solid var(--fase-actual);
+  border-inline-end: var(--linea) solid var(--fase-actual);
+  translate: 0 -50%;
+  rotate: 45deg;
+  transform-origin: 70% 30%;
+}
+
+/* Se dibuja etapa por etapa. */
+html[data-uso='presentacion'] .diap[data-activa] .pipeline__nodo {
+  animation: pipe-nodo var(--mov-lento) var(--curva-salida) both;
+  animation-delay: calc(var(--mov-medio) + var(--i) * var(--mov-lento));
+}
+html[data-uso='presentacion'] .diap[data-activa] .pipeline__nombre {
+  animation: pipe-texto var(--mov-lento) var(--curva-salida) both;
+  animation-delay: calc(var(--mov-medio) + var(--i) * var(--mov-lento) + var(--mov-rapido));
+}
+html[data-uso='presentacion'] .diap[data-activa] .pipeline__union {
+  animation: pipe-linea var(--mov-lento) var(--curva-suave) both;
+  animation-delay: calc(var(--mov-medio) + var(--i) * var(--mov-lento) + var(--mov-medio));
+}
+html[data-uso='presentacion'] .diap[data-activa] .pipeline__etapa[data-final] .pipeline__nodo {
+  animation:
+    pipe-nodo var(--mov-lento) var(--curva-salida) both,
+    pipe-llega var(--mov-escena) var(--curva-salida) both;
+  animation-delay:
+    calc(var(--mov-medio) + var(--i) * var(--mov-lento)),
+    calc(var(--mov-medio) + var(--i) * var(--mov-lento) + var(--mov-lento));
+}
+@keyframes pipe-nodo {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+@keyframes pipe-texto {
+  from {
+    opacity: 0;
+    transform: translateY(var(--esp-2));
+  }
+}
+@keyframes pipe-linea {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+}
+@keyframes pipe-llega {
+  from {
+    box-shadow: 0 0 0 0 var(--fase-actual);
+  }
+  to {
+    box-shadow: 0 0 0 calc(var(--nodo) * 0.5) transparent;
+  }
+}
+
+/* ── Celular ──────────────────────────────────────────────────────────────── */
+
+.celular {
+  --lado: calc(var(--proy-cuerpo) * 12);
+  position: relative;
+  align-self: stretch;
+  inline-size: var(--lado);
+  min-block-size: 17.5em;
+  margin: 0;
+  font-size: calc(var(--lado) / 13);
+  line-height: 1.25;
+  overflow: hidden;
+  /* El celular emerge por abajo: se desvanece hacia la superficie (la máscara solo lee el canal alfa). */
+  -webkit-mask-image: linear-gradient(to bottom, var(--superficie) 78%, transparent);
+  mask-image: linear-gradient(to bottom, var(--superficie) 78%, transparent);
+}
+html[data-uso='lectura'] .celular {
+  --lado: var(--lado-celular-ilustracion);
+}
+.celular__marco {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 28em;
+  border: 0.4em solid var(--borde-fuerte);
+  border-radius: 2.2em;
+  background: var(--superficie-hundida);
+}
+.celular__isla {
+  position: absolute;
+  inset-block-start: 0.8em;
+  inset-inline-start: 50%;
+  inline-size: 3.6em;
+  block-size: 1em;
+  translate: -50% 0;
+  border-radius: 1em;
+  background: var(--tinta-fuerte);
+  opacity: 0.85;
+}
+.celular__pantalla {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: start;
+  padding: 0.9em 0.8em;
+  border-radius: 1.8em;
+  background: color-mix(in srgb, var(--fase-actual) 9%, var(--superficie-hundida));
+}
+
+/* Barra de estado: hora y señal (dibujadas, sin iconos externos). */
+.celular__estado {
+  margin-block-end: 1.1em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 0.7em;
+  font-size: 0.72em;
+  font-weight: 700;
+  color: var(--tinta-fuerte);
+}
+.celular__senal {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.14em;
+}
+.celular__senal i {
+  inline-size: 0.2em;
+  border-radius: 0.1em;
+  background: currentColor;
+}
+.celular__senal i:nth-child(1) {
+  block-size: 0.4em;
+}
+.celular__senal i:nth-child(2) {
+  block-size: 0.65em;
+}
+.celular__senal i:nth-child(3) {
+  block-size: 0.9em;
+}
+.celular__senal i:nth-child(4) {
+  block-size: 1.15em;
+}
+.celular__senal b {
+  inline-size: 1.4em;
+  block-size: 0.7em;
+  margin-inline-start: 0.4em;
+  border: 0.1em solid currentColor;
+  border-radius: 0.25em;
+  background: linear-gradient(to right, currentColor 72%, transparent 72%);
+}
+
+/* La notificación. */
+.notif {
+  display: grid;
+  gap: 0.45em;
+  padding: 0.75em 0.8em 0.85em;
+  border: var(--filete) solid color-mix(in srgb, var(--fase-actual) 55%, transparent);
+  border-radius: 1.1em;
+  background: var(--superficie-elevada);
+  color: var(--tinta);
+}
+.notif__cab {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.78em;
+  color: var(--tinta-suave);
+}
+.notif__icono {
+  display: grid;
+  place-items: center;
+  inline-size: 1.9em;
+  block-size: 1.9em;
+  border-radius: 0.55em;
+  background: var(--fase-actual);
+  color: var(--realce-tinta);
+}
+.notif__icono svg {
+  inline-size: 68%;
+  block-size: 68%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.notif__app {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.notif__cuando {
+  margin-inline-start: auto;
+}
+.notif__titulo {
+  margin: 0;
+  font-family: var(--fuente-display);
+  font-size: 1.12em;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--tinta-fuerte);
+  text-wrap: balance;
+}
+.notif__campos {
+  display: grid;
+  gap: 0.2em;
+  margin: 0;
+  font-size: 0.88em;
+}
+.notif__campo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5em;
+}
+.notif__campo dt {
+  min-inline-size: 4.6em;
+  color: var(--tinta-suave);
+}
+.notif__campo dd {
+  margin: 0;
+  font-weight: 700;
+  color: var(--tinta-fuerte);
+}
+.notif__campo:last-child {
+  flex-direction: column;
+  gap: 0;
+}
+.notif__campo:last-child dd {
+  color: var(--enlace);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Llega desde arriba, con un único anillo de aviso. */
+html[data-uso='presentacion'] .diap .notif[data-paso] {
+  transform: translateY(-1.2em) scale(0.97);
+}
+html[data-uso='presentacion'] .diap .notif[data-paso][data-visto] {
+  transform: none;
+  animation: notif-llega var(--mov-escena) var(--curva-salida) both;
+}
+@keyframes notif-llega {
+  from {
+    box-shadow: 0 0 0 0 var(--fase-actual);
+  }
+  to {
+    box-shadow: 0 0 0 0.9em transparent;
+  }
+}
+
+/* ── Pantallas chicas ─────────────────────────────────────────────────────── */
+
+@media (max-width: 820px) {
+  .ci__cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pipeline {
+    --hueco: calc(var(--proy-cuerpo) * 2.6);
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--hueco);
+  }
+  .pipeline__etapa {
+    grid-template-columns: auto minmax(0, 1fr);
+    justify-items: start;
+    align-items: center;
+    column-gap: var(--esp-4);
+    text-align: start;
+  }
+  .pipeline__union {
+    inset-block-start: calc(var(--nodo) + var(--esp-2));
+    inset-inline-start: calc(var(--nodo) / 2 - var(--linea) / 2);
+    inline-size: var(--linea);
+    block-size: calc(var(--hueco) - var(--esp-2) * 2);
+    transform-origin: center top;
+  }
+  .pipeline__union::after {
+    inset-block-start: auto;
+    inset-block-end: 0;
+    inset-inline-end: 50%;
+    translate: 50% 0;
+    rotate: 135deg;
+  }
+  .celular {
+    justify-self: center;
+    align-self: auto;
+    min-block-size: 0;
+    block-size: 20em;
+  }
+  html[data-uso='presentacion'] .diap[data-activa] .pipeline__union {
+    animation-name: pipe-linea-v;
+  }
+}
+@keyframes pipe-linea-v {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}
+
+/* Sin movimiento: el pipeline y la notificación aparecen de una vez. */
+@media (prefers-reduced-motion: reduce) {
+  .pipeline__nodo,
+  .pipeline__nombre,
+  .pipeline__union,
+  .notif {
+    animation-delay: 0s !important;
+  }
+}

@@ -1,4 +1,17 @@
 ---
+/**
+ * «Hitos, no maratones». Dos vistas del mismo tipo (se eligen con `datos.vista`):
+ *
+ *  - `rebanada`: el concepto. Una rejilla capas × hitos donde un hito atraviesa
+ *    pantalla, lógica, datos y tests de una vez (rebanada vertical). Se
+ *    sincroniza con los pasos de la lista: 1 la rebanada y su criterio de
+ *    terminado, 2 probado y siguiente, 3 módulos desacoplados.
+ *  - `roadmap`: el roadmap del hotel, un hito por avance, con el ciclo
+ *    termina → se publica → se prueba → siguiente al final.
+ *
+ * Todo el texto sale del frontmatter (`datos`); aquí solo hay estructura y
+ * dibujo (SVG con clases que leen tokens, nunca colores sueltos).
+ */
 import type { ItemDiapo } from '../../lib/deck';
 
 interface Props {
@@ -6,13 +19,119 @@ interface Props {
   etiquetaBloque: string;
 }
 const { d } = Astro.props;
+
+type Estado = 'probado' | 'en-curso' | 'pendiente';
+interface Hito {
+  nombre: string;
+  estado: Estado;
+}
+const datos = d.datos as {
+  vista?: 'rebanada' | 'roadmap';
+  columnas?: number;
+  capas?: string[];
+  criterio?: string;
+  pie?: string;
+  hitos?: Hito[];
+  ciclo?: string[];
+};
+const vista = datos.vista ?? 'rebanada';
+const capas = datos.capas ?? [];
+const columnas = datos.columnas ?? 5;
+const hitos = datos.hitos ?? [];
+const ciclo = datos.ciclo ?? [];
+const ESTADOS: Record<Estado, string> = { probado: 'probado', 'en-curso': 'en curso', pendiente: 'pendiente' };
+const descripcionRebanada = `Un hito atraviesa todas las capas a la vez (${capas.join(', ').toLowerCase()}) y termina con su ${(datos.criterio ?? '').toLowerCase()}. Cinco rebanadas verticales, una por hito.`;
 ---
 
-<div class="texto">
+<div class={`hitos hitos--${vista}`}>
   <header class="cabeza">
-    {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
     <h3 class="titulo ent" style="--i:1">{d.titulo}</h3>
-    {d.subtitulo && <p class="subtitulo ent" style="--i:2">{d.subtitulo}</p>}
   </header>
-  <div class="texto__cuerpo ent" style="--i:3" set:html={d.html} />
+
+  {vista === 'rebanada' && (
+    <div class="hitos__duo">
+      <div class="hitos__texto lista__items ent" style="--i:2" set:html={d.html} />
+
+      <figure class="rebanada ent" style="--i:3" aria-label={descripcionRebanada}>
+        <div class="rebanada__rejilla" aria-hidden="true" style={`--cols:${columnas}; --filas:${capas.length}`}>
+          {/* Fila 1: bandera del criterio de terminado, sobre la primera rebanada. */}
+          <p class="rebanada__criterio" data-paso="1">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M6 21V4M6 5h11l-2.5 3.5L17 12H6" /></svg>
+            <span>{datos.criterio}</span>
+          </p>
+
+          {/* Filas 2 a N+1: una por capa, con su etiqueta a la izquierda. */}
+          {capas.map((capa, r) => (
+            <Fragment>
+              <span class="rebanada__capa" style={`grid-row:${r + 2}`}>{capa}</span>
+              {Array.from({ length: columnas }, (_, c) => (
+                <span class="rebanada__celda" data-col={c} style={`grid-row:${r + 2}; grid-column:${c + 2}; --r:${r}; --c:${c}`} />
+              ))}
+            </Fragment>
+          ))}
+
+          {/* Contorno de cada rebanada: la primera es la que se explica; la segunda es «el siguiente». */}
+          <span class="rebanada__marco rebanada__marco--hecho" data-paso="1" style={`grid-row:2 / span ${capas.length}; grid-column:2`} />
+          <span class="rebanada__marco rebanada__marco--siguiente" data-paso="2" style={`grid-row:2 / span ${capas.length}; grid-column:3`} />
+
+          {/* Última fila: número de hito; el 1 se convierte en check al probarse. */}
+          <span class="rebanada__capa rebanada__capa--pie" style={`grid-row:${capas.length + 2}`}>{datos.pie}</span>
+          {Array.from({ length: columnas }, (_, c) => (
+            <span class="rebanada__num" data-col={c} style={`grid-row:${capas.length + 2}; grid-column:${c + 2}`}>
+              <span class="rebanada__n">{c + 1}</span>
+              {c === 0 && (
+                <svg class="rebanada__ok" viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="10" /><path d="M7.5 12.5l3 3 6-6.5" /></svg>
+              )}
+            </span>
+          ))}
+        </div>
+      </figure>
+    </div>
+  )}
+
+  {vista === 'roadmap' && (
+    <div class="hitos__ruta">
+      <ol class="ruta" aria-label="Hitos del hotel">
+        {hitos.map((h, i) => (
+          <li class="ruta__hito" data-paso={i + 1} data-estado={h.estado} aria-current={h.estado === 'en-curso' ? 'step' : undefined} style={`--i:${i}`}>
+            <span class="ruta__icono" aria-hidden="true">
+              {h.estado === 'probado' && (
+                <svg viewBox="0 0 24 24" focusable="false"><circle class="ico-disco" cx="12" cy="12" r="10.5" /><path class="ico-marca" d="M7.2 12.6l3.3 3.3 6.3-6.9" /></svg>
+              )}
+              {h.estado === 'en-curso' && (
+                <svg viewBox="0 0 24 24" focusable="false"><circle class="ico-anillo" cx="12" cy="12" r="10" /><path class="ico-arco" d="M12 2a10 10 0 0 1 10 10" /><circle class="ico-punto" cx="12" cy="12" r="3" /></svg>
+              )}
+              {h.estado === 'pendiente' && (
+                <svg viewBox="0 0 24 24" focusable="false"><circle class="ico-vacio" cx="12" cy="12" r="10" /></svg>
+              )}
+            </span>
+            <span class="ruta__texto">
+              <span class="ruta__num">Hito {i + 1}</span>
+              <span class="ruta__nombre">{h.nombre}</span>
+            </span>
+            <span class="ruta__rebanada" aria-hidden="true">
+              {capas.map((_, k) => <span style={`--k:${k}`} />)}
+            </span>
+            <span class="ruta__estado">{ESTADOS[h.estado]}</span>
+          </li>
+        ))}
+      </ol>
+
+      {ciclo.length > 0 && (
+        <div class="vuelta" data-paso={hitos.length + 1}>
+          <ol class="vuelta__lista" aria-label="Cómo se pasa de un hito al siguiente">
+            {ciclo.map((paso, i) => (
+              <li class="vuelta__paso" style={`--i:${i}`}>
+                <span class="vuelta__texto">{paso}</span>
+                {i < ciclo.length - 1 && (
+                  <svg class="vuelta__flecha" viewBox="0 0 40 24" aria-hidden="true" focusable="false"><path pathLength="1" d="M3 12h32M27 5l8 7-8 7" /></svg>
+                )}
+              </li>
+            ))}
+          </ol>
+          <svg class="vuelta__retorno" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5" /></svg>
+        </div>
+      )}
+    </div>
+  )}
 </div>

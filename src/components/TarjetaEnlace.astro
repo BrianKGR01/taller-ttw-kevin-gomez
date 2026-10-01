@@ -1,0 +1,64 @@
+---
+/**
+ * Tarjeta de vista previa de enlace, como la que muestra WhatsApp al pegar una
+ * URL: imagen, título, descripción y dominio. Es un enlace (la flecha "→" lo
+ * marca, sistema de diseño §6) y se abre en pestaña nueva.
+ *
+ * Los metadatos vienen de src/data/enlaces.json (scripts/obtener-og.mjs, a
+ * mano con `pnpm datos:og`; el build no usa la red). Si falta la entrada, la
+ * imagen o `ok` es false, se dibuja una tarjeta de respaldo con el nombre del
+ * sitio y el enlace. Los estilos viven en src/styles/tipos/tarjetas.css.
+ */
+import { Image } from 'astro:assets';
+import enlaces from '../data/enlaces.json';
+import { datosDeEnlace, type EntradaEnlace } from '../lib/enlaces';
+
+interface Props {
+  url: string;
+  /** `horizontal`: miniatura a la izquierda (cabe apilada en media diapositiva). */
+  disposicion?: 'vertical' | 'horizontal';
+  /** Las imágenes de las diapositivas ocultas se cargan al mostrarse. */
+  carga?: 'lazy' | 'eager';
+  sizes?: string;
+}
+const { url, disposicion = 'vertical', carga = 'lazy', sizes = '(max-width: 820px) 94vw, 44vw' } = Astro.props;
+
+const imagenes = import.meta.glob<{ default: ImageMetadata }>('../assets/enlaces/*.webp', { eager: true });
+const datos = datosDeEnlace(url, enlaces as EntradaEnlace[]);
+const imagen = datos.imagen ? imagenes[`../${datos.imagen}`]?.default : undefined;
+const conImagen = datos.completo && Boolean(imagen);
+---
+
+<a
+  class:list={['tarjeta', `tarjeta--${disposicion}`, { 'tarjeta--respaldo': !conImagen }]}
+  href={datos.url}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label={`${datos.titulo}, ${datos.dominio} (se abre en una pestaña nueva)`}
+  data-enlace={datos.dominio}
+>
+  <div class="tarjeta__medio">
+    {
+      conImagen && imagen ? (
+        <Image src={imagen} alt={`Vista previa de ${datos.sitio}`} width={1200} height={630} widths={[480, 720, 1200]} sizes={sizes} loading={carga} decoding="async" />
+      ) : (
+        <div class="tarjeta__marcador" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
+            <path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1" />
+          </svg>
+          <span class="tarjeta__nombre">{datos.sitio}</span>
+        </div>
+      )
+    }
+  </div>
+  <div class="tarjeta__cuerpo">
+    <p class="tarjeta__dominio">
+      <span>{datos.dominio}</span>
+      <span class="tarjeta__flecha" aria-hidden="true">→</span>
+    </p>
+    {/* En el respaldo el nombre ya está grande en el panel: no se repite. */}
+    {(conImagen || datos.titulo !== datos.sitio) && <p class="tarjeta__titulo">{datos.titulo}</p>}
+    {datos.descripcion && <p class="tarjeta__desc">{datos.descripcion}</p>}
+  </div>
+</a>

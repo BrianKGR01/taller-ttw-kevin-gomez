@@ -1,0 +1,193 @@
+/* ── Vista de presentador ─────────────────────────────────────────────────── */
+
+.pagina-presentador {
+  overflow: auto;
+}
+html[data-uso]:has(.pagina-presentador) {
+  overflow: auto;
+  block-size: auto;
+}
+html[data-uso]:has(.pagina-presentador) body {
+  overflow: auto;
+  block-size: auto;
+}
+
+.pres {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
+  grid-template-areas:
+    'cab cab'
+    'escenas notas'
+    'pie pie';
+  gap: var(--esp-4);
+  min-block-size: var(--alto-vista);
+  padding: var(--esp-4);
+}
+
+.pres__cab {
+  grid-area: cab;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-4) var(--esp-6);
+}
+.pres__reloj {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+}
+.pres__tiempo {
+  min-inline-size: 5ch;
+  font-family: var(--fuente-mono);
+  font-size: var(--escala-titulo);
+  line-height: 1;
+  font-weight: 700;
+  color: var(--tinta-fuerte);
+  font-variant-numeric: tabular-nums;
+}
+.pres__bloque {
+  --c: var(--fase-actual);
+  flex: 1;
+  min-inline-size: var(--presentador-bloque-min);
+  display: grid;
+  gap: var(--esp-1);
+}
+.pres__bloque-nombre {
+  margin: 0;
+  font-family: var(--fuente-display);
+  font-size: var(--escala-cuerpo-lg);
+  font-weight: 700;
+  color: var(--tinta-fuerte);
+}
+.pres__bloque-tiempo {
+  margin: 0;
+  font-family: var(--fuente-mono);
+  font-size: var(--escala-nota);
+  color: var(--tinta-suave);
+}
+.pres__bloque[data-tiempo='atencion'] .progreso__barra {
+  background: var(--fase-3);
+}
+.pres__bloque[data-tiempo='excedido'] .progreso__barra {
+  background: var(--fase-2);
+}
+.pres__bloque[data-tiempo='excedido'] [data-bloque-reloj] {
+  color: var(--fase-2);
+  font-weight: 700;
+}
+.pres__version {
+  display: flex;
+  gap: var(--esp-2);
+}
+.pres__version [aria-pressed='true'] {
+  border-color: var(--fase-actual);
+  background: var(--fase-suave);
+}
+
+.pres__escenas {
+  grid-area: escenas;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--esp-4);
+  align-items: start;
+}
+.pres__escenas figure {
+  margin: 0;
+  display: grid;
+  gap: var(--esp-2);
+}
+.pres__marco {
+  --k: 0.5;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: var(--filete) solid var(--borde-fuerte);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie);
+}
+.pres__actual .pres__marco {
+  border-color: var(--fase-actual);
+}
+.pres__iframe {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: var(--miniatura-ancho);
+  block-size: var(--miniatura-alto);
+  border: 0;
+  transform: scale(var(--k));
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.pres__notas {
+  grid-area: notas;
+  display: grid;
+  align-content: start;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+  border: var(--filete) solid var(--borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--superficie-elevada);
+  font-size: var(--escala-cuerpo-lg);
+  line-height: var(--interlinea-cuerpo);
+}
+.pres__notas h2,
+.pres__notas p {
+  margin: 0;
+}
+.pres__notas-diapo {
+  color: var(--tinta-fuerte);
+  font-weight: 700;
+}
+.pres__notas-diapo:empty {
+  display: none;
+}
+.pres__notas-bloque p {
+  margin: 0 0 var(--esp-3);
+}
+.pres__vacio {
+  color: var(--tinta-suave);
+}
+.pres__recorte {
+  padding-block-start: var(--esp-3);
+  border-block-start: var(--filete) solid var(--borde);
+  font-size: var(--escala-nota);
+}
+.pres__recorte summary {
+  cursor: pointer;
+  min-block-size: var(--area-tactil);
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  color: var(--tinta-fuerte);
+}
+
+.pres__pie {
+  grid-area: pie;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-3);
+}
+.pres__estado {
+  flex: 1;
+  min-inline-size: var(--presentador-estado-min);
+  margin: 0;
+  font-family: var(--fuente-mono);
+  font-size: var(--escala-nota);
+  color: var(--tinta-suave);
+}
+
+@media (max-width: 1000px) {
+  .pres {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'cab'
+      'escenas'
+      'notas'
+      'pie';
+  }
+}

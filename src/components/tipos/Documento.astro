@@ -1,18 +1,111 @@
 ---
+/**
+ * Tipo `documento`: un archivo real (AGENTS.md, roadmap) dibujado como una
+ * hoja. En presentación la cámara la recorre sección por sección
+ * (src/cliente/tour.ts, src/lib/camara.ts); en lectura es una hoja ancha,
+ * completa, con botones para copiarla y descargarla.
+ *
+ * Contenido (frontmatter, `datos`):
+ *   archivo:    nombre del .md en ejemplos/
+ *   descarga:   nombre del archivo en public/descargas/ (opcional)
+ *   secciones:  [{ titulo: "<texto exacto del ##>", etiqueta: "<para qué sirve>" }]
+ */
 import type { ItemDiapo } from '../../lib/deck';
+import { renderizarDocumento, type PasoTour } from '../../lib/documento';
+import CopiarBoton from '../CopiarBoton.astro';
+import Descarga from '../Descarga.astro';
 
 interface Props {
   d: ItemDiapo;
   etiquetaBloque: string;
 }
 const { d } = Astro.props;
+
+const fuentes = import.meta.glob('../../../ejemplos/*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const DESCARGAS: Record<string, string> = {
+  'AGENTS.md': 'ejemplo-AGENTS-hotel.md',
+  'roadmap.md': 'ejemplo-roadmap-hotel.md',
+};
+
+const archivo = String(d.datos.archivo ?? '');
+const fuente = fuentes[`../../../ejemplos/${archivo}`];
+if (fuente === undefined) throw new Error(`Diapositiva ${d.id}: no existe ejemplos/${archivo}`);
+const tour: PasoTour[] = (d.datos.secciones ?? []) as PasoTour[];
+const descarga = String(d.datos.descarga ?? DESCARGAS[archivo] ?? archivo);
+const doc = renderizarDocumento(fuente, tour);
+// El portapapeles recibe el archivo con saltos de línea \n aunque el repositorio lo guarde con \r\n.
+const textoPlano = fuente.replace(/\r\n/g, '\n');
+const prefijo = `doc-${d.id.replace('.', '-')}`;
+const total = tour.length;
+// Columnas de la hoja en la vista de pájaro: una hoja alta y angosta es una cinta; en columnas se lee como mapa.
+const columnas = Math.max(1, Number(d.datos.columnas ?? 1));
+const dos = (n: number) => String(n).padStart(2, '0');
 ---
 
-<div class="texto">
-  <header class="cabeza">
-    {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
-    <h3 class="titulo ent" style="--i:1">{d.titulo}</h3>
-    {d.subtitulo && <p class="subtitulo ent" style="--i:2">{d.subtitulo}</p>}
+<div class="documento" data-documento data-total={total} data-estado="general" style={`--columnas-doc:${columnas}`}>
+  <header class="documento__banda">
+    <div class="documento__rotulos">
+      <div class="rotulo rotulo--general">
+        {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
+        <h3 class="titulo ent" style="--i:1">{d.titulo}</h3>
+      </div>
+      {tour.map((p, i) => (
+        <div class="rotulo rotulo--seccion" data-rotulo={i + 1} aria-hidden="true">
+          <p class="rotulo__kicker">
+            <span class="rotulo__num">{dos(i + 1)}</span><span class="rotulo__de">/{dos(total)}</span>
+            <span class="rotulo__titulo">{p.titulo}</span>
+          </p>
+          <p class="rotulo__etiqueta">{p.etiqueta}</p>
+        </div>
+      ))}
+    </div>
+    <div class="documento__acciones">
+      <CopiarBoton valor={textoPlano} etiqueta="Copiar" nombre={`${archivo} completo`} />
+      <Descarga archivo={descarga} etiqueta="Descargar" />
+    </div>
   </header>
-  <div class="texto__cuerpo ent" style="--i:3" set:html={d.html} />
+
+  {d.html && <div class="documento__nota" set:html={d.html} />}
+
+  <details class="documento__guia">
+    <summary>Para qué sirve cada sección ({total})</summary>
+    <ol class="documento__lista">
+      {tour.map((p) => (
+        <li>
+          <strong>{p.titulo}</strong>
+          <span>{p.etiqueta}</span>
+        </li>
+      ))}
+    </ol>
+  </details>
+
+  <div class="documento__vista" data-vista>
+    <div class="documento__camara" data-camara>
+      <article class="hoja" data-hoja aria-label={`Documento ${archivo}`}>
+        <div class="hoja__cabecera" set:html={doc.cabecera} />
+        {doc.secciones.map((s) => (
+          <section
+            class="doc-sec"
+            id={`${prefijo}-s${s.indice}`}
+            data-sec={s.indice}
+            data-tour={s.paso ?? undefined}
+            data-num={s.paso ? dos(s.paso) : undefined}
+            data-num={s.paso ? dos(s.paso) : undefined}
+            aria-labelledby={`${prefijo}-h${s.indice}`}
+          >
+            <h5 class="doc-h doc-h2" id={`${prefijo}-h${s.indice}`}>{s.titulo}</h5>
+            <Fragment set:html={s.html} />
+          </section>
+        ))}
+      </article>
+    </div>
+    <ol class="documento__indice" aria-hidden="true">
+      {tour.map((p, i) => (
+        <li data-indice={i + 1} style={`--i:${i}`}>
+          <span class="documento__indice-num">{dos(i + 1)}</span>
+          <span class="documento__indice-titulo">{p.titulo}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
 </div>

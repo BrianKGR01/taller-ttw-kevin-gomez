@@ -1,4 +1,10 @@
 ---
+/**
+ * Tarjeta de cita del post de Robert C. Martin. No imita la interfaz de X:
+ * es una tarjeta del sistema de diseño con el texto, autor, cuenta, fecha y
+ * enlace al original. Datos verificados en recursos-origen/post-unclebob.json.
+ */
+import post from '../../../recursos-origen/post-unclebob.json';
 import type { ItemDiapo } from '../../lib/deck';
 
 interface Props {
@@ -6,13 +12,23 @@ interface Props {
   etiquetaBloque: string;
 }
 const { d } = Astro.props;
+const parrafos = post.texto.split(/\n\n+/);
 ---
 
-<div class="texto">
+<div class="cita-x">
   <header class="cabeza">
     {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
     <h3 class="titulo ent" style="--i:1">{d.titulo}</h3>
-    {d.subtitulo && <p class="subtitulo ent" style="--i:2">{d.subtitulo}</p>}
   </header>
-  <div class="texto__cuerpo ent" style="--i:3" set:html={d.html} />
+  <figure class="cita-x__tarjeta ent" style="--i:2">
+    <blockquote class="cita-x__texto" lang="en">
+      {parrafos.map((p) => <p>{p}</p>)}
+    </blockquote>
+    <figcaption class="cita-x__pie">
+      <span class="cita-x__autor"><strong>{post.autor}</strong> <span class="cita-x__cuenta">{post.cuenta}</span></span>
+      <time datetime={post.fecha}>{post.fechaLegible}</time>
+      <a class="accion accion--enlace" href={post.url} target="_blank" rel="noopener noreferrer">Ver el post original <span aria-hidden="true">→</span></a>
+    </figcaption>
+  </figure>
+  {d.html && <div class="cita-x__nota ent" style="--i:3" set:html={d.html} />}
 </div>

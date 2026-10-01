@@ -1,1 +1,548 @@
-/* tipos/documento */
+/* tipos/documento
+ *
+ * Una hoja de papel con el documento real, y una cámara que la recorre.
+ * La hoja se dibuja a su tamaño natural (--ancho-hoja-doc); la cámara es una
+ * transformación (translate + scale, origen arriba a la izquierda) que calcula
+ * src/cliente/tour.ts y anima el navegador en la GPU. Todo lo que se mueve es
+ * transform y opacity.
+ */
+
+.documento {
+  /* Ancho de una columna de la hoja y cuántas columnas tiene (solo en la vista de presentación). */
+  --col-doc: var(--ancho-hoja-doc);
+  --columnas: var(--columnas-doc, 1);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--proy-gap);
+  min-inline-size: 0;
+}
+
+/* ── Banda: rótulo del paso actual y acciones ───────────────────────────── */
+
+.documento__banda {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--proy-gap-grande);
+}
+.documento__rotulos {
+  display: grid;
+  flex: 1;
+  min-inline-size: 0;
+}
+.rotulo {
+  grid-area: 1 / 1;
+  display: grid;
+  align-content: start;
+  gap: var(--esp-1);
+  min-inline-size: 0;
+}
+.rotulo--general .titulo {
+  font-size: var(--proy-subtitulo);
+}
+.rotulo--seccion {
+  opacity: 0;
+  transform: translateY(var(--desp-corto));
+  pointer-events: none;
+}
+.rotulo__kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--esp-2);
+  margin: 0;
+  font-family: var(--fuente-mono);
+  font-size: var(--proy-codigo);
+  letter-spacing: 0.04em;
+  color: var(--tinta-suave);
+}
+.rotulo__num {
+  font-weight: 700;
+  color: var(--fase-actual);
+}
+.rotulo__titulo {
+  margin-inline-start: var(--esp-2);
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--tinta-fuerte);
+}
+.rotulo__etiqueta {
+  margin: 0;
+  font-size: var(--proy-cuerpo);
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta);
+  text-wrap: balance;
+}
+.documento__acciones {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+}
+
+/* ── Lo que solo existe en lectura ──────────────────────────────────────── */
+
+.documento__nota,
+.documento__guia {
+  display: none;
+}
+.documento__nota p {
+  margin: 0;
+  max-inline-size: var(--ancho-lectura-texto);
+  font-size: var(--escala-cuerpo);
+  line-height: var(--interlinea-cuerpo);
+}
+.documento__guia summary {
+  display: list-item;
+  list-style-position: inside;
+  min-block-size: var(--area-tactil);
+  line-height: var(--area-tactil);
+  font-size: var(--escala-nota);
+  font-weight: 700;
+  color: var(--tinta-fuerte);
+  cursor: pointer;
+}
+.documento__lista {
+  display: grid;
+  gap: var(--esp-3);
+  margin: 0;
+  padding: 0 0 0 var(--esp-5);
+  font-size: var(--escala-nota);
+  line-height: var(--interlinea-nota);
+}
+.documento__lista strong {
+  display: block;
+  color: var(--tinta-fuerte);
+}
+.documento__lista span {
+  color: var(--tinta-suave);
+}
+
+/* ── Vista y cámara ──────────────────────────────────────────────────────── */
+
+.documento__vista {
+  position: relative;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+.documento__camara {
+  inline-size: var(--col-doc);
+  max-inline-size: 100%;
+}
+
+html[data-uso='presentacion'] .diap--documento {
+  grid-template-rows: minmax(0, 1fr);
+  padding-block: calc(var(--proy-barra) + var(--esp-2)) var(--proy-barra);
+  padding-inline: var(--canal);
+}
+html[data-uso='presentacion'] .diap.diap--documento[data-activa],
+html[data-uso='presentacion'] .diap.diap--documento[data-saliendo] {
+  align-content: stretch;
+}
+html[data-uso='presentacion'] .diap--documento .diap__cuerpo {
+  block-size: 100%;
+  max-inline-size: none;
+}
+html[data-uso='presentacion'] .documento {
+  block-size: 100%;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+html[data-uso='presentacion'] .documento__vista {
+  /* `clip` y no `hidden`: un foco dentro de la hoja no puede desplazar la vista. */
+  overflow: clip;
+}
+html[data-uso='presentacion'] .documento__camara {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  /* Columnas + sangrías (una a cada lado y una entre columnas) = el ancho de la hoja. */
+  inline-size: calc(var(--col-doc) * var(--columnas) + var(--esp-6) * (var(--columnas) + 1));
+  max-inline-size: none;
+  transform-origin: 0 0;
+  transform: translate3d(var(--cam-x, 0px), var(--cam-y, 0px), 0) scale(var(--cam-s, 1));
+  transition: transform var(--mov-recorrido) var(--curva-suave);
+}
+/* Deriva lenta por una sección más alta que la vista: la duración la fija el cliente. */
+html[data-uso='presentacion'] .documento__camara[data-deriva] {
+  transition-duration: var(--deriva-dur, var(--mov-recorrido));
+  transition-timing-function: var(--curva-estandar);
+}
+/* Mientras el cliente mide: sin animar (primer cuadro, cambio de tamaño, regreso a la diapositiva). */
+html[data-uso='presentacion'] .documento__camara[data-quieta] {
+  transition: none;
+}
+/* Hasta que el cliente la coloca, la hoja no se ve (evita un cuadro con la hoja sin cámara). */
+html[data-uso='presentacion'] .documento:not([data-listo]) .documento__camara {
+  opacity: 0;
+}
+
+/* ── Índice de la vista completa ─────────────────────────────────────────── */
+
+.documento__indice {
+  display: none;
+}
+html[data-uso='presentacion'] .documento__indice {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--esp-2);
+  inline-size: 46%;
+  max-block-size: min(100%, var(--alto-indice-doc));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transition: opacity var(--mov-medio) var(--curva-estandar);
+}
+html[data-uso='presentacion'] .documento[data-estado='seccion'] .documento__indice {
+  opacity: 0;
+}
+.documento__indice li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--esp-4);
+  font-size: var(--proy-codigo);
+  line-height: var(--interlinea-subtitulo);
+  color: var(--tinta-fuerte);
+}
+.documento__indice-num {
+  font-family: var(--fuente-mono);
+  font-weight: 700;
+  color: var(--fase-actual);
+}
+html[data-uso='presentacion'] .diap[data-activa] .documento__indice li {
+  animation: ent var(--mov-lento) var(--curva-salida) both;
+  animation-delay: calc(var(--mov-medio) + var(--i, 0) * var(--mov-escalon));
+}
+
+/* ── Estado del recorrido ────────────────────────────────────────────────── */
+
+.rotulo {
+  transition:
+    opacity var(--mov-medio) var(--curva-estandar),
+    transform var(--mov-lento) var(--curva-salida);
+}
+.documento[data-estado='seccion'] .rotulo--general {
+  opacity: 0;
+}
+.rotulo--seccion[data-actual] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* Las acciones se apartan cuando nadie las usa (como el resto del marco). */
+html[data-ocioso][data-uso='presentacion'] .documento__acciones {
+  opacity: 0;
+}
+html[data-ocioso][data-uso='presentacion'] .documento__acciones:focus-within {
+  opacity: 1;
+}
+.documento__acciones {
+  transition: opacity var(--mov-medio) var(--curva-estandar);
+}
+
+/* ── La hoja ─────────────────────────────────────────────────────────────── */
+
+.hoja {
+  position: relative;
+  padding: var(--esp-7) var(--esp-6) var(--esp-6);
+  border: var(--filete) solid var(--borde);
+  border-radius: var(--radio-chico);
+  background: var(--superficie-elevada);
+  box-shadow: 0 var(--esp-5) var(--esp-8) calc(var(--esp-3) * -1) color-mix(in srgb, var(--tinta-fuerte) 26%, transparent);
+  font-family: var(--fuente-texto);
+  font-size: var(--escala-cuerpo);
+  line-height: var(--interlinea-nota);
+  color: var(--tinta);
+  overflow-wrap: break-word;
+  text-align: start;
+}
+.hoja strong {
+  color: var(--tinta-fuerte);
+}
+.hoja p {
+  margin: 0 0 var(--esp-3);
+}
+.hoja ul,
+.hoja ol {
+  margin: 0 0 var(--esp-3);
+  padding-inline-start: var(--esp-6);
+}
+.hoja li {
+  margin-block-end: var(--esp-2);
+}
+.hoja li > p,
+.hoja li > ul,
+.hoja li > ol {
+  margin-block-end: var(--esp-2);
+}
+.hoja li::marker {
+  color: var(--tinta-suave);
+}
+.hoja ul {
+  list-style: disc;
+}
+.hoja ol {
+  list-style: decimal;
+}
+/* Lista de casillas (ítems sueltos o separados por líneas en blanco): sin viñeta ni sangría. */
+.hoja ul:is(:has(> li > input[type='checkbox']), :has(> li > p > input[type='checkbox'])) {
+  padding-inline-start: 0;
+  list-style: none;
+}
+.hoja input[type='checkbox'] {
+  inline-size: 1em;
+  block-size: 1em;
+  margin: 0 var(--esp-2) 0 0;
+  vertical-align: -0.12em;
+  accent-color: var(--fase-actual);
+}
+.hoja code {
+  padding: 0.08em 0.35em;
+  border-radius: var(--radio-chico);
+  background: var(--superficie-hundida);
+  font-family: var(--fuente-mono);
+  font-size: 0.88em;
+  color: var(--tinta-fuerte);
+  overflow-wrap: anywhere;
+}
+.hoja .doc-enlace {
+  color: var(--enlace);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.hoja blockquote {
+  margin: 0 0 var(--esp-3);
+  padding-inline-start: var(--esp-4);
+  border-inline-start: var(--esp-1) solid var(--borde-fuerte);
+  color: var(--tinta-suave);
+}
+.hoja blockquote p:last-child {
+  margin-block-end: 0;
+}
+.hoja hr {
+  margin-block: var(--esp-4);
+  border: 0;
+  border-block-start: var(--filete) solid var(--borde);
+}
+.hoja .doc-codigo {
+  margin: 0 0 var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+  overflow-x: auto;
+  border-radius: var(--radio-chico);
+  background: var(--superficie-hundida);
+  font-family: var(--fuente-mono);
+  font-size: 0.88em;
+  line-height: var(--interlinea-nota);
+}
+.hoja .doc-codigo code {
+  padding: 0;
+  background: none;
+}
+
+/* Tablas */
+.hoja .doc-tabla {
+  margin-block: var(--esp-3);
+  overflow-x: auto;
+}
+.hoja table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: 0.92em;
+}
+.hoja th {
+  padding: var(--esp-2) var(--esp-3);
+  border-block-end: var(--filete) solid var(--borde-fuerte);
+  font-family: var(--fuente-mono);
+  font-size: 0.82em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: start;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+.hoja td {
+  padding: var(--esp-2) var(--esp-3);
+  border-block-end: var(--filete) solid var(--borde);
+  vertical-align: top;
+}
+
+/* Títulos de la hoja: # → doc-h1, ## → doc-h2 (la sección), ### → doc-h3. */
+.hoja .doc-h {
+  margin: 0;
+  font-family: var(--fuente-display);
+  font-weight: 700;
+  line-height: var(--interlinea-titulo);
+  letter-spacing: -0.01em;
+  color: var(--tinta-fuerte);
+}
+.hoja .doc-h1 {
+  margin-block-end: var(--esp-4);
+  padding-block-end: var(--esp-4);
+  background: var(--gradiente-borde) bottom / 100% var(--filete) no-repeat;
+  font-size: calc(var(--escala-cuerpo) * 1.9);
+}
+.hoja .doc-h3,
+.hoja .doc-h4 {
+  margin-block: var(--esp-4) var(--esp-2);
+  font-size: calc(var(--escala-cuerpo) * 1.12);
+}
+
+/* Hoja en columnas (vista de presentación): la sección no se parte, el título cruza todas. */
+html[data-uso='presentacion'] .hoja {
+  column-count: var(--columnas);
+  column-gap: var(--esp-6);
+  column-rule: var(--filete) solid var(--borde);
+}
+html[data-uso='presentacion'] .hoja__cabecera {
+  display: contents;
+}
+html[data-uso='presentacion'] .hoja .doc-h1 {
+  column-span: all;
+}
+html[data-uso='presentacion'] .doc-sec {
+  break-inside: avoid;
+}
+
+/* Secciones: bandas alternas que, en la vista de pájaro, dibujan el mapa del documento. */
+.doc-sec {
+  position: relative;
+  padding: var(--esp-4) var(--esp-3) var(--esp-2);
+  border-block-start: var(--filete) solid var(--borde);
+  transition: opacity var(--mov-lento) var(--curva-estandar);
+}
+.doc-sec:nth-of-type(even) {
+  background: color-mix(in srgb, var(--tinta) 4%, transparent);
+}
+.hoja .doc-h2 {
+  margin-block-end: var(--esp-3);
+  padding: var(--esp-2) var(--esp-3);
+  border-inline-start: var(--esp-2) solid transparent;
+  font-size: calc(var(--escala-cuerpo) * 1.4);
+  transition:
+    background-color var(--mov-lento) var(--curva-estandar),
+    border-color var(--mov-lento) var(--curva-estandar);
+}
+/* Vista completa: el número de cada sección, enorme, para ubicarla en el índice. */
+.doc-sec[data-num]::before {
+  content: attr(data-num);
+  position: absolute;
+  inset-block-start: var(--esp-2);
+  inset-inline-end: var(--esp-3);
+  font-family: var(--fuente-mono);
+  font-size: calc(var(--escala-cuerpo) * 9);
+  font-weight: 700;
+  line-height: 1;
+  color: color-mix(in srgb, var(--fase-actual) 38%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--mov-lento) var(--curva-estandar);
+}
+html[data-uso='presentacion'] .documento[data-estado='general'] .doc-sec[data-num]::before {
+  opacity: 1;
+}
+
+/* Vista completa: todos los títulos tintados, para que la hoja se lea como mapa. */
+.documento[data-estado='general'] .hoja .doc-h2 {
+  border-inline-start-color: var(--fase-actual);
+  background: var(--fase-suave);
+}
+/* Recorrido: el resto de la hoja se apaga y la sección actual queda resaltada. */
+.documento[data-estado='seccion'] .doc-sec:not([aria-current]) {
+  opacity: 0.38;
+}
+.documento[data-estado='seccion'] .doc-sec[aria-current] > .doc-h2 {
+  border-inline-start-color: var(--fase-actual);
+  background: var(--fase-suave);
+}
+
+/* ── Lectura: la hoja completa, sin cámara ───────────────────────────────── */
+
+html[data-uso='lectura'] .documento {
+  gap: var(--proy-gap-grande);
+}
+html[data-uso='lectura'] .documento__banda {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--proy-gap);
+}
+html[data-uso='lectura'] .rotulo--seccion {
+  display: none;
+}
+html[data-uso='lectura'] .rotulo--general .titulo {
+  font-size: var(--proy-titulo);
+}
+html[data-uso='lectura'] .documento__nota,
+html[data-uso='lectura'] .documento__guia {
+  display: block;
+}
+html[data-uso='lectura'] .documento__camara {
+  inline-size: auto;
+}
+html[data-uso='lectura'] .hoja {
+  column-count: auto;
+}
+html[data-uso='lectura'] .doc-sec:not([aria-current]) {
+  opacity: 1;
+}
+html[data-uso='lectura'] .documento .doc-h2 {
+  border-inline-start-color: var(--fase-actual);
+}
+
+/* ── Pantallas angostas ──────────────────────────────────────────────────── */
+
+@media (max-width: 820px) {
+  .documento {
+    --col-doc: var(--ancho-hoja-doc-movil);
+  }
+  html[data-uso='presentacion'] .documento__indice {
+    display: none;
+  }
+  html[data-uso='presentacion'] .documento__banda {
+    flex-direction: column;
+    gap: var(--esp-2);
+  }
+  .hoja {
+    padding-inline: var(--esp-4);
+  }
+  .hoja th,
+  .hoja td {
+    padding-inline: var(--esp-2);
+  }
+  /* En celular la hoja aprovecha el ancho: anula el relleno de la tarjeta de la diapositiva. */
+  html[data-uso='lectura'] .documento__vista {
+    margin-inline: calc(var(--esp-5) * -1);
+  }
+  html[data-uso='lectura'] .hoja {
+    padding: var(--esp-5) var(--esp-3) var(--esp-4);
+    border-inline-width: 0;
+    border-radius: 0;
+  }
+}
+
+/* ── Movimiento reducido: la cámara salta, sin deriva ni fundidos ─────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-uso='presentacion'] .documento__camara,
+  .rotulo,
+  .doc-sec,
+  .hoja .doc-h2,
+  .documento__acciones,
+  html[data-uso='presentacion'] .documento__indice {
+    transition: none;
+  }
+  html[data-uso='presentacion'] .documento__vista {
+    /* Sin deriva, una sección larga se lee desplazando la vista a mano. */
+    overflow-x: clip;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  html[data-uso='presentacion'] .diap[data-activa] .documento__indice li {
+    animation: none;
+  }
+}

@@ -175,7 +175,7 @@
    * pueden usar light-dark(): se redefinen abajo para el modo claro, igual que
    * --resplandor. La malla de gradiente respira; la red de nodos es mas tenue.
    */
-  --atmosfera-opacidad: 0.22;
+  --atmosfera-opacidad: 0.14;
   --red-opacidad: 0.5;
   --video-opacidad: 0.5;
   --video-mezcla: screen;
