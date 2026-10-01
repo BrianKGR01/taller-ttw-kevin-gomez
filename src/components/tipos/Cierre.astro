@@ -1,0 +1,18 @@
+---
+import type { ItemDiapo } from '../../lib/deck';
+
+interface Props {
+  d: ItemDiapo;
+  etiquetaBloque: string;
+}
+const { d } = Astro.props;
+---
+
+<div class="texto">
+  <header class="cabeza">
+    {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
+    <h3 class="titulo ent" style="--i:1">{d.titulo}</h3>
+    {d.subtitulo && <p class="subtitulo ent" style="--i:2">{d.subtitulo}</p>}
+  </header>
+  <div class="texto__cuerpo ent" style="--i:3" set:html={d.html} />
+</div>

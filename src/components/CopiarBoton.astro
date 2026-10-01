@@ -1,0 +1,17 @@
+---
+/**
+ * Botón "Copiar" para un texto que no vive en un bloque de código (por ejemplo,
+ * un documento entero). El cliente (src/cliente/copiar.ts) copia `valor` y
+ * muestra la confirmación animada.
+ */
+interface Props {
+  valor: string;
+  etiqueta?: string;
+  nombre?: string;
+}
+const { valor, etiqueta = 'Copiar', nombre = 'el texto' } = Astro.props;
+---
+
+<button type="button" class="accion accion--secundaria" data-copiar data-copiar-valor={valor} aria-label={`Copiar ${nombre}`}>
+  <span data-copiar-texto>{etiqueta}</span>
+</button>

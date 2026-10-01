@@ -1,0 +1,16 @@
+mi-proyecto/
+├── AGENTS.md                 # reglas para todos los agentes
+├── CLAUDE.md                 # importa AGENTS.md
+├── docs/
+│   ├── 01-spec-funcional.md
+│   ├── 02-design-system.md
+│   ├── 03-spec-tecnica.md
+│   ├── roadmap.md            # hitos con criterio de terminado
+│   ├── progreso.md           # el agente anota qué hizo y qué sigue
+│   └── decisiones/           # un archivo por módulo (ADR)
+│       ├── auth.md
+│       └── reservas.md
+├── src/
+└── tests/
+    ├── unit/
+    └── e2e/

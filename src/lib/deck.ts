@@ -78,6 +78,8 @@ export async function cargarBloques(): Promise<ItemBloque[]> {
         pasos: r.pasos,
       };
       if (d.data.tipo === 'tabla') item.tabla = tablaDeMd(pres);
+      // El recorrido de un documento tiene un paso por sección y uno final que vuelve a la vista completa.
+      if (d.data.tipo === 'documento') item.pasos = ((d.data.datos?.secciones as unknown[] | undefined)?.length ?? 0) + 1;
       return item;
     });
 

@@ -1,0 +1,17 @@
+---
+/**
+ * Descarga directa de un archivo de public/descargas/. Es una `Accion`
+ * (secundaria por defecto): lo único con forma de píldora.
+ */
+interface Props {
+  archivo: string;
+  etiqueta?: string;
+  variante?: 'principal' | 'secundaria';
+}
+const { archivo, etiqueta = 'Descargar', variante = 'secundaria' } = Astro.props;
+---
+
+<a class={`accion accion--${variante} descarga`} href={`/descargas/${archivo}`} download={archivo}>
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14"/></svg>
+  <span>{etiqueta}</span>
+</a>

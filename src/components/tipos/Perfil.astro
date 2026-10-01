@@ -1,0 +1,28 @@
+---
+import { Image } from 'astro:assets';
+import perfil from '../../assets/personas/perfil.webp';
+import type { ItemDiapo } from '../../lib/deck';
+import { FASES } from '../../lib/fases';
+
+interface Props {
+  d: ItemDiapo;
+  etiquetaBloque: string;
+}
+const { d, etiquetaBloque } = Astro.props;
+const fase = d.fase ? FASES[d.fase - 1] : undefined;
+const Titulo = d.tipo === 'portada' ? 'h1' : 'h3';
+void etiquetaBloque; void fase; void Titulo;
+---
+
+<div class="perfil">
+  <div class="perfil__foto ent" style="--i:0">
+    <Image src={perfil} alt="Retrato de Kevin Brayan Gómez Rocha" width={480} height={480} widths={[240, 360, 480]} sizes="(max-width: 820px) 60vw, 28vw" loading="eager" />
+  </div>
+  <div class="perfil__texto">
+    <p class="etiqueta ent" style="--i:1">{d.etiqueta}</p>
+    <h3 class="titulo titular ent" style="--i:2">{d.titulo}</h3>
+    <p class="subtitulo ent" style="--i:3">{d.datos.rol}</p>
+    <div class="perfil__lista ent" style="--i:4" set:html={d.html} />
+    <p class="perfil__comunidades ent" style="--i:5">{d.datos.comunidades}</p>
+  </div>
+</div>

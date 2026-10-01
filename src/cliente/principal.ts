@@ -27,6 +27,7 @@ import { activarTipeo, restaurarTipeo } from './tipeo';
 import { iniciarCopiar } from './copiar';
 import { iniciarVideos } from './video';
 import { anunciar } from './anuncio';
+import { iniciarTour } from './tour';
 
 const raiz = document.documentElement;
 const deck: Deck = JSON.parse(document.getElementById('deck-meta')!.textContent!);
@@ -79,6 +80,8 @@ function actualizarMarco() {
 function aplicarPasos(el: HTMLElement | undefined, p: number) {
   if (!el) return;
   el.dataset.p = String(p);
+  // Los tipos con animación propia (recorrido de documentos) escuchan este evento.
+  el.dispatchEvent(new CustomEvent('taller:paso', { bubbles: true, detail: { p, uso } }));
   $$('[data-paso]', el).forEach((x) => {
     if (Number(x.dataset.paso) <= p) x.setAttribute('data-visto', '');
     else x.removeAttribute('data-visto');
@@ -142,6 +145,11 @@ function irALectura(s: Estado, suave = true) {
 }
 
 const sig = () => ir(avanzar(deck, estado));
+// Un componente puede pedir avanzar un paso (auto-avance del recorrido). Solo vale si su diapositiva es la actual.
+document.addEventListener('taller:avanzar', (e) => {
+  const origen = e.target as HTMLElement | null;
+  if (uso === 'presentacion' && origen?.closest('.diap') === elDe(estado)) sig();
+});
 const ant = () => ir(retroceder(deck, estado));
 
 /* ───────────────────────── Modo de uso ───────────────────────── */
@@ -511,6 +519,7 @@ aplicarUso(uso, false);
 actualizarHash();
 iniciarCopiar();
 iniciarVideos();
+iniciarTour();
 despertar();
 $('#principal')?.setAttribute('data-listo', '');
 raiz.dataset.listo = '';

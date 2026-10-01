@@ -1,0 +1,35 @@
+---
+import type { ItemDiapo } from '../../lib/deck';
+import { FASES } from '../../lib/fases';
+
+interface Props {
+  d: ItemDiapo;
+  etiquetaBloque: string;
+}
+const { d, etiquetaBloque } = Astro.props;
+const fase = d.fase ? FASES[d.fase - 1] : undefined;
+const Titulo = d.tipo === 'portada' ? 'h1' : 'h3';
+void etiquetaBloque; void fase; void Titulo;
+---
+
+<div class="tabla">
+  <header class="cabeza">
+    {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
+    <Titulo class="titulo ent" style="--i:1">{d.titulo}</Titulo>
+  </header>
+  <div class={`tabla__cols tabla__cols--${d.tabla.cols.length}`} role="table" aria-label={d.titulo}>
+    <div role="rowgroup" class="solo-lectura">
+      <div role="row">{d.tabla.cols.map((c) => <span role="columnheader" set:html={c} />)}</div>
+    </div>
+    {d.tabla.cols.map((c, ci) => (
+      <section class="tabla__col" data-lado={ci === 0 ? 'izq' : ci === d.tabla!.cols.length - 1 ? 'der' : 'centro'} style={`--col:${ci}`}>
+        <h4 class="tabla__cab" set:html={c} />
+        <ul class="tabla__filas">
+          {d.tabla!.filas.map((f, fi) => (
+            <li class="tabla__fila" style={`--fila:${fi}`} set:html={f[ci]} />
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</div>

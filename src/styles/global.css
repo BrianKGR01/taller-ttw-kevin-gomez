@@ -12,3 +12,12 @@
 @import './ciclo.css';
 @import './codigo.css';
 @import './lectura.css';
+@import './tipos/cita.css';
+@import './tipos/libros.css';
+@import './tipos/ejecucion.css';
+@import './tipos/documento.css';
+@import './tipos/hitos.css';
+@import './tipos/carpetas.css';
+@import './tipos/ci.css';
+@import './tipos/tarjetas.css';
+@import './tipos/cierre.css';

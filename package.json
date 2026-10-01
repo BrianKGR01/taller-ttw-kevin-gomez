@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node scripts/verificar-tokens.mjs",
+    "prebuild": "node scripts/verificar-tokens.mjs && node scripts/preparar-descargas.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "typecheck": "astro check",

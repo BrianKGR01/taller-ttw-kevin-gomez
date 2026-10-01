@@ -1,0 +1,30 @@
+---
+import Video from '../Video.astro';
+import type { ItemDiapo } from '../../lib/deck';
+import { FASES } from '../../lib/fases';
+
+interface Props {
+  d: ItemDiapo;
+  etiquetaBloque: string;
+}
+const { d, etiquetaBloque } = Astro.props;
+const fase = d.fase ? FASES[d.fase - 1] : undefined;
+const Titulo = d.tipo === 'portada' ? 'h1' : 'h3';
+void etiquetaBloque; void fase; void Titulo;
+---
+
+<>
+  <Video nombre="agentes1" clase="portada__video" />
+  <div class="portada__texto">
+    <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>
+    <Titulo class="portada__titulo titular ent" style="--i:1">{d.titulo}</Titulo>
+    <p class="portada__sub ent" style="--i:2" data-teclear-linea>
+      <span class="prompt-signo" aria-hidden="true">&gt;</span>
+      <span data-teclear-texto>{d.subtitulo}</span>
+    </p>
+    <div class="portada__firma ent" style="--i:3">
+      <img class="logo logo--oscuro" src="/media/gdg-logo-oscuro.svg" width="1920" height="390" alt="Google Developer Group Santa Cruz" />
+      <img class="logo logo--claro" src="/media/gdg-logo-claro.svg" width="1920" height="390" alt="Google Developer Group Santa Cruz" />
+    </div>
+  </div>
+</>

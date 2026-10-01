@@ -1,0 +1,22 @@
+---
+import type { ItemDiapo } from '../../lib/deck';
+import { FASES } from '../../lib/fases';
+
+interface Props {
+  d: ItemDiapo;
+  etiquetaBloque: string;
+}
+const { d, etiquetaBloque } = Astro.props;
+const fase = d.fase ? FASES[d.fase - 1] : undefined;
+const Titulo = d.tipo === 'portada' ? 'h1' : 'h3';
+void etiquetaBloque; void fase; void Titulo;
+---
+
+<div class="lista">
+  <header class="cabeza">
+    {d.etiqueta && <p class="etiqueta ent" style="--i:0">{d.etiqueta}</p>}
+    <Titulo class="titulo ent" style="--i:1">{d.titulo}</Titulo>
+    {d.subtitulo && <p class="subtitulo ent" style="--i:2">{d.subtitulo}</p>}
+  </header>
+  <div class="lista__items" set:html={d.html} />
+</div>
